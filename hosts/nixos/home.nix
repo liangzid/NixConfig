@@ -1,0 +1,83 @@
+{ config, pkgs, ... }:
+
+{
+  imports = [
+    ../../modules/home/emacs.nix
+    ../../modules/home/waybar.nix
+    ../../modules/home/foot.nix
+    ../../modules/home/gtk.nix
+  ];
+
+  home.username = "zi";
+  home.homeDirectory = "/home/zi";
+  home.stateVersion = "26.05";
+
+  home.packages = with pkgs; [
+    wofi
+    waybar
+    foot
+    nemo
+    dunst
+    libnotify
+
+    juno-theme
+    beauty-line-icon-theme
+
+    grim
+    slurp
+
+    wl-clipboard
+    xclip
+
+    awww
+
+    pavucontrol
+
+    wl-clipboard
+    w3m
+    aspell
+    scrot
+    jdk17
+    graphviz
+    python3
+    mplayer
+    socat
+    cmake
+    ripgrep
+    silver-searcher
+    uv
+
+    pkg-config
+    glib
+    openssl
+    gtk3
+    atk
+    librime
+    libtool
+    mesa
+    freeglut
+    enchant
+    gcc
+  ];
+
+  home.shellAliases = {
+    xclip = "wl-copy";
+  };
+
+  home.sessionVariables = {
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
+    SDL_IM_MODULE = "fcitx";
+    GLFW_IM_MODULE = "ibus";
+    INPUT_METHOD = "fcitx";
+  };
+
+  programs.bash.enable = true;
+
+  xdg.mimeApps.enable = true;
+
+  xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
+  xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
+  xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
+}
