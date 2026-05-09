@@ -33,8 +33,16 @@
     layout = "us";
     variant = "";
   };
+  services.logind.settings = {
+    Login = {
+        HandlePowerKey = "ignore";
+        HandleSuspendKey = "ignore";
+        HandleHibernateKey = "ignore";
+    };
+  };
 
   security.polkit.enable = true;
+  security.pam.services.swaylock = {};
 
   users.users.zi = {
     isNormalUser = true;
