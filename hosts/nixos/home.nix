@@ -80,6 +80,9 @@
     steam-run
 
 
+    # Locking Screen and Laptop-Related
+    swaylock-effects
+    swayidle
 
   ];
 
@@ -94,6 +97,13 @@
     SDL_IM_MODULE = "fcitx";
     GLFW_IM_MODULE = "ibus";
     INPUT_METHOD = "fcitx";
+
+    # For Nvidia
+    LIBVA_DRIVER_NAME = "nvidia";
+    XDG_SESSION_TYPE = "wayland";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    WLR_NO_HARDWARE_CURSORS = "1";
   };
 
   programs.bash.enable = true;
@@ -101,6 +111,7 @@
 
   xdg.mimeApps.enable = true;
 
+  xdg.configFile."hypr/hyprland.conf".force = true;
   xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;

@@ -6,10 +6,14 @@
   };
 
   hardware.nvidia = {
+    # Close source
     open = false;
+
+    # Stable version
     package = config.boot.kernelPackages.nvidiaPackages.stable;
 
+    # For Hyprland
     modesetting.enable = true;
-    powerManagement.enable = false;
+    powerManagement.enable = true;
   };
 }
