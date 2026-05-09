@@ -58,6 +58,29 @@
     freeglut
     enchant
     gcc
+
+
+    # Media
+    imv
+    mpv
+    termusic
+    obs-studio
+    vlc
+
+    # Develop (Just for back up)
+    vscode-fhs
+    texliveFull
+
+    # Other IM channel
+    discord
+    telegram-desktop
+    zapzap
+
+    # Gaming
+    steam-run
+
+
+
   ];
 
   home.shellAliases = {
@@ -74,6 +97,7 @@
   };
 
   programs.bash.enable = true;
+
 
   xdg.mimeApps.enable = true;
 
