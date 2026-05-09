@@ -1,0 +1,92 @@
+#+title: NixOS Configurations
+#+date: Sat May  9 12:11:30 2026
+#+author: Zi Liang
+#+email: zi1415926.liang@connect.polyu.hk
+#+latex_class: elegantpaper
+#+filetags: ::
+
+[[file:./images/screenshot_20260509_125220.png]]
+
+[[file:./images/screenshot_20260509_125139.png]]
+
+[[file:./images/screenshot_20260509_125317.png]]
+
+[[file:./images/screenshot_20260509_125943.png]]
+
+I spend two days to move my previous linux configuration and development environments into NixOS.
+
+This document is the note of it, also performing as the README file.
+
+* What is NixOS?
+
+NixOS is a special Linux distro built upon the =Nix=.
+
+So what is Nix?
+
+Nix is:
++ A functional programming language, and a DSL for addressing the configuration problems.
++ A package management tool.
++ An OS.
+
+
+Core idea of Nix/NixOS:
++ Anything of a SYSTEM can be described, and thus, thanks to the feature of functional definition, it can be easily reproduced.
++ Similar to =git=, Nix/NixOS employ a more efficient way to manage different package versions and corresponding dependencies, where two different version of the same program can be coexistent with each other.
++ Different from the snapshot, NixOS allows to boot under any version of the NixOS BUILD, which demonstrate that a man will not be worried about any OS crash.
+
+
+Why I use it:
++ I'd like to keep the configuration be =可积累的=
++ I enjoy this way, just like why I like to use emacs.
+
+* What This Configuration Contains?
+
+This configuration contains a *minimal* configuration of my new desktop environment.
+
+It is a TTY environment by default, BUT providing a very beautiful and robust and convinent DESKTOP development environment.
+
+The schema as list below:
+
+|----------------+------------------|
+| Component      | Solution         |
+|----------------+------------------|
+| System         | NixOS (26.05)    |
+| Use Flake?     | Yes              |
+| Default OS Env | TTY              |
+| Desktop Env    | Wayland          |
+| Desktop        | Hyprland         |
+| Launcher       | wofi             |
+| Status Bar     | waybar           |
+| Terminal       | foot*            |
+| File Manager   | nemo*            |
+| Notificationsa | dunst/libnotify  |
+| GTK            | juno-theme       |
+| Icon           | beauty-line-icon |
+| Capture        | grim/slurp       |
+| Wallpaper      | awww             |
+| Editor         | emacs/vim        |
+| Agent          | opencode         |
+|----------------+------------------|
+
+Note: This list will keep increase and changed dynamically.
+
+** Necessary Packages
+
+
+
+** For Chinese Users
+
++ IM: I use =wechat-uos= and =qq=
++ Input Method: =fcitx5= with =pinyin= -- 很好用的！
++ Office: WPS (What can I say?)
+
+** For Emacs Users
+
+Surely it is =emacs-overlay=
+
+
+
+
+
+
+
