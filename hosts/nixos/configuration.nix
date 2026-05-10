@@ -88,6 +88,7 @@
     wpsoffice
     corefonts
     vista-fonts
+    clash-verge-rev
   ];
 
   programs.nm-applet.enable = true;
