@@ -4,7 +4,6 @@
   imports = [
     ../../modules/home/emacs.nix
     ../../modules/home/waybar.nix
-    ../../modules/home/foot.nix
     ../../modules/home/gtk.nix
   ];
 
@@ -89,7 +88,6 @@
 
 
     # Terminal
-    foot
     ghostty
     wezterm
     zellij
@@ -122,11 +120,109 @@
   programs.bash.enable = true;
 
 
+  programs.ssh = {
+    enable = true;
+    matchBlocks = {
+      "bastion" = {
+        hostname = "is1.astaple.com";
+        user = "zi";
+      };
+      "gs10" = {
+        hostname = "gs10.astaple.com";
+        user = "zi";
+      };
+      "gs10o" = {
+        hostname = "gs10.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "gs11" = {
+        hostname = "gs11.astaple.com";
+        user = "zi";
+      };
+      "gs11o" = {
+        hostname = "gs11.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "gs12" = {
+        hostname = "gs12.astaple.com";
+        user = "zi";
+      };
+      "gs12o" = {
+        hostname = "gs12.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "gs13" = {
+        hostname = "gs13.astaple.com";
+        user = "zi";
+      };
+      "gs13o" = {
+        hostname = "gs13.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "gs14" = {
+        hostname = "gs14.astaple.com";
+        user = "zi";
+      };
+      "gs14o" = {
+        hostname = "gs14.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "gs15" = {
+        hostname = "gs15.astaple.com";
+        user = "zi";
+      };
+      "gs15o" = {
+        hostname = "gs15.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "gs16" = {
+        hostname = "gs16.astaple.com";
+        user = "zi";
+      };
+      "gs16o" = {
+        hostname = "gs16.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "cs1" = {
+        hostname = "cs1.astaple.com";
+        user = "zi";
+      };
+      "cs1o" = {
+        hostname = "cs1.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+      "cs2" = {
+        hostname = "cs2.astaple.com";
+        user = "zi";
+      };
+      "cs2o" = {
+        hostname = "cs2.astaple.com";
+        user = "zi";
+        proxyJump = "bastion";
+      };
+    };
+
+    extraConfig = ''
+      ServerAliveInterval 60
+      ServerAliveCountMax 5
+      AddKeysToAgent yes
+    '';
+  };
+
   xdg.mimeApps.enable = true;
 
   xdg.configFile."hypr/hyprland.conf".force = true;
   xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
-  xdg.configFile."zellij/config.kdl".source = ../../dotfiles/zellij/config.kdl;
+  xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
+
 }
