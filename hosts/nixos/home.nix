@@ -106,6 +106,10 @@
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     WLR_NO_HARDWARE_CURSORS = "1";
   };
+  home.file."${config.xdg.dataHome}/fonts/wps-fonts" = {
+    source = ../../dotfiles/fonts/wps;
+    recursive = true;
+    };
 
   programs.bash.enable = true;
 
