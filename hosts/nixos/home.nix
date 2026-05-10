@@ -15,7 +15,6 @@
   home.packages = with pkgs; [
     wofi
     waybar
-    foot
     nemo
     dunst
     libnotify
@@ -85,6 +84,15 @@
     swaylock-effects
     swayidle
 
+    shotcut
+    kdePackages.kdenlive
+
+
+    # Terminal
+    foot
+    ghostty
+    wezterm
+    zellij
   ];
 
   home.shellAliases = {
@@ -120,4 +128,5 @@
   xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
+  xdg.configFile."zellij/config.kdl".source = ../../dotfiles/zellij/config.kdl;
 }
