@@ -66,6 +66,7 @@
     termusic
     obs-studio
     vlc
+    kdePackages.okular
 
     # Develop (Just for back up)
     vscode-fhs

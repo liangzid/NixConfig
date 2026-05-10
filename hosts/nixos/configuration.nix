@@ -56,19 +56,38 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
+    curl
+    killall
+    tree
+    nvtopPackages.full
+    btop
+    iotop
+    eza
+    fzf
+    duf
+    ncdu
     opencode
     firefox
     git
     tmux
-    wechat-uos
-    qq
     fastfetch
     htop
+
+
+    wechat-uos
+    qq
+    wemeet
+    wpsoffice
+    corefonts
+    vista-fonts
   ];
 
+  programs.nm-applet.enable = true;
 
   programs.steam = {
     enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
   };
 
   system.stateVersion = "26.05";
