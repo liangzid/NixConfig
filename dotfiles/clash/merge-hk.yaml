@@ -1,0 +1,26 @@
+# Merge: Hong Kong mode
+# Most traffic → DIRECT. Only AI services need proxy.
+
+rules:
+  # ── Local & Private ──
+  - DOMAIN,localhost,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+
+  # ── Lab ──
+  - DOMAIN-SUFFIX,astaple.com,DIRECT
+
+  # ── AI Services (blocked in HK, need non-HK node) ──
+  - DOMAIN-SUFFIX,chatgpt.com,Proxy
+  - DOMAIN-SUFFIX,openai.com,Proxy
+  - DOMAIN-SUFFIX,anthropic.com,Proxy
+  - DOMAIN-SUFFIX,claude.ai,Proxy
+  - DOMAIN-SUFFIX,oaistatic.com,Proxy
+  - DOMAIN-SUFFIX,oaiusercontent.com,Proxy
+  - DOMAIN-SUFFIX,intercom.io,Proxy
+  - DOMAIN-SUFFIX,intercomcdn.com,Proxy
+
+  # ── Everything else direct ──
+  - MATCH,DIRECT

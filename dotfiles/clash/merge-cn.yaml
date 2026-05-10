@@ -1,0 +1,24 @@
+# Merge: Mainland mode
+# Subscription handles default routing (China direct, foreign proxy).
+# This file only adds specific rules on top.
+
+rules:
+  # ── Local & Private ──
+  - DOMAIN,localhost,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+
+  # ── Lab ──
+  - DOMAIN-SUFFIX,astaple.com,DIRECT
+
+  # ── AI Services ──
+  - DOMAIN-SUFFIX,chatgpt.com,Proxy
+  - DOMAIN-SUFFIX,openai.com,Proxy
+  - DOMAIN-SUFFIX,anthropic.com,Proxy
+  - DOMAIN-SUFFIX,claude.ai,Proxy
+  - DOMAIN-SUFFIX,oaistatic.com,Proxy
+  - DOMAIN-SUFFIX,oaiusercontent.com,Proxy
+  - DOMAIN-SUFFIX,intercom.io,Proxy
+  - DOMAIN-SUFFIX,intercomcdn.com,Proxy
