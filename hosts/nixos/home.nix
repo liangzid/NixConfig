@@ -228,8 +228,14 @@
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
   xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
-  xdg.configFile."fcitx5/conf/classicui.conf".source = ../../dotfiles/fcitx5/classicui.conf;
-  xdg.configFile."fcitx5/conf/pinyin.conf".source = ../../dotfiles/fcitx5/pinyin.conf;
+  xdg.configFile."fcitx5/conf/classicui.conf" = {
+    source = ../../dotfiles/fcitx5/classicui.conf;
+    force = true;
+  };
+  xdg.configFile."fcitx5/conf/pinyin.conf" = {
+    source = ../../dotfiles/fcitx5/pinyin.conf;
+    force = true;
+  };
 
   home.activation.cloneEmacs = config.lib.dag.entryAfter ["writeBoundary"] ''
     if [ ! -d "$HOME/.emacs.d/.git" ]; then
