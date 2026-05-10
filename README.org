@@ -13,7 +13,7 @@
 
 [[file:./images/screenshot_20260509_125943.png]]
 
-I spent two days to move my previous linux configuration and development environments into NixOS.
+I spent -two- three days to move my previous linux configuration and development environments into NixOS.
 
 This document is the note of it, also performing as the README file.
 
@@ -47,45 +47,41 @@ It is a TTY environment by default, BUT providing a very beautiful and robust an
 
 The schema as list below:
 
-|----------------+------------------|
-| Component      | Solution         |
-|----------------+------------------|
-| System         | NixOS (26.05)    |
-| Use Flake?     | Yes              |
-| Default OS Env | TTY              |
-| Desktop Env    | Wayland          |
-| Desktop        | Hyprland         |
-| Launcher       | wofi             |
-| Status Bar     | waybar           |
-| Terminal       | foot*            |
-| File Manager   | nemo*            |
-| Notifications  | dunst/libnotify  |
-| GTK            | juno-theme       |
-| Icon           | beauty-line-icon |
-| Capture        | grim/slurp       |
-| Wallpaper      | awww             |
-| Editor         | emacs/vim        |
-| Agent          | opencode         |
-|----------------+------------------|
+|----------------+-------------------------------|
+| Component      | Solution                      |
+|----------------+-------------------------------|
+| System         | NixOS (26.05)                 |
+| Use Flake?     | Yes                           |
+| Default OS Env | TTY                           |
+| Desktop Env    | Wayland                       |
+| Desktop        | Hyprland                      |
+| Launcher       | wofi                          |
+| Status Bar     | waybar                        |
+| Terminal       | ghostty                      |
+| File Manager   | nemo*                         |
+| Notifications  | dunst/libnotify               |
+| GTK            | juno-theme                    |
+| Icon           | beauty-line-icon              |
+| Capture        | grim/slurp/swappy             |
+| Wallpaper      | awww                          |
+| Editor         | emacs/vim                     |
+| Agent          | opencode                      |
+| VPN/Proxy      | clash-verge-rev               |
+|----------------+-------------------------------|
 
 Note: This list will keep increase and changed dynamically.
 
-** Necessary Packages
+** Chinese Input & Communication
 
++ Input Method: =fcitx5= with =rime= and =pinyin=, theme =Material-Color-deepPurple=
++ Communication: =wechat-uos=, =qq=
++ VPN: =clash-verge-rev=
+  
 
+** Emacs
 
-** For Chinese Users
-
-+ IM: I use =wechat-uos= and =qq=
-+ Input Method: =fcitx5= with =pinyin= -- 很好用的！
-+ Office: WPS (What can I say?)
-
-** For Emacs Users
-
-Surely it is =emacs-overlay=
-
-
-
+Emacs is pulled from the [[https://github.com/nix-community/emacs-overlay][emacs-overlay]], providing the latest =emacs-unstable-pgtk= build with native Wayland support.
+The Emacs configuration is auto-cloned from [[https://github.com/liangzid/a.emacs.d][a.emacs.d]] via =home.activation= during first rebuild.
 
 * Repository Structure
 
@@ -96,26 +92,29 @@ nix-config/
 ├── bootstrap.sh              # Install / apply / build-ISO
 ├── hosts/
 │   └── nixos/
-│       ├── configuration.nix # System-level config (boot, users, packages)
+│       ├── configuration.nix # System-level config (boot, users, packages, ssh, steam)
 │       ├── hardware-configuration.nix
-│       └── home.nix          # User-level config (packages, env, dotfiles)
+│       └── home.nix          # User-level config (packages, env, dotfiles, ssh hosts)
 ├── modules/
 │   ├── system/               # Reusable system modules
-│   │   ├── hyprland.nix
-│   │   ├── nvidia.nix
-│   │   ├── fonts.nix
-│   │   ├── input-method.nix
-│   │   ├── pipewire.nix
-│   │   ├── portal.nix
-│   │   └── kanata.nix
+│   │   ├── hyprland.nix      # Hyprland WM with xwayland
+│   │   ├── nvidia.nix        # NVIDIA GPU + modesetting
+│   │   ├── fonts.nix         # CJK + nerd fonts
+│   │   ├── input-method.nix  # fcitx5 + rime + cloudpinyin + theme
+│   │   ├── pipewire.nix      # Audio: pipewire + alsa + pulse
+│   │   ├── portal.nix        # XDG desktop portal for Wayland
+│   │   └── kanata.nix        # CapsLock → Control remap
 │   └── home/                 # Reusable home-manager modules
-│       ├── emacs.nix
-│       ├── waybar.nix
-│       ├── foot.nix
-│       └── gtk.nix
+│       ├── emacs.nix          # Emacs + vterm
+│       ├── waybar.nix        # Status bar with tokyonight theme
+│       └── gtk.nix           # GTK theme + dark mode
 └── dotfiles/                 # Configuration files managed by home-manager
-    ├── hypr/hyprland.conf
-    └── wofi/{config,style.css}
+    ├── hypr/hyprland.conf    # Hyprland keybindings + autostart
+    ├── wofi/{config,style.css}
+    ├── ghostty/config        # Terminal with Emacs-style keybinds + Aura theme
+    ├── clash/merge-hk.yaml   # GFW bypass rules (Hong Kong mode)
+    ├── clash/merge-cn.yaml   # GFW bypass rules (Mainland mode)
+    └── fcitx5/{classicui,pinyin}.conf  # Input method theming & behaviour
 #+end_src
 
 * Getting Started
@@ -124,7 +123,6 @@ nix-config/
 
 #+begin_src bash
   git clone https://github.com/liangzid/nix-config.git ~/code/NixConfig
-  # or git clone https://gitlab.com/liangzid/nix-config.git ~/code/NixConfig
   sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos
 #+end_src
 
@@ -145,6 +143,15 @@ Or use the bootstrap script:
 This will generate a hardware config for the new machine, clone the repo,
 and run =nixos-install --flake=.
 
+** Tip: Quick Rebuild
+
+Use the =update= alias (defined in [[./hosts/nixos/configuration.nix][configuration.nix]]):
+#+begin_src bash
+  update
+#+end_src
+Remember to =git add= any newly created files before rebuilding, as the flake
+requires all referenced files to be Git-tracked.
+
 * Hyprland Keybindings
 
 All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hyprland.conf]]
@@ -159,14 +166,76 @@ All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hy
 | =Super + V=             | Toggle floating                  |
 | =Super + F=             | Toggle fullscreen                |
 | =Super + R=             | Enter resize mode (arrows / HJKL)|
-| =Super + T=             | Open terminal (=foot=)           |
+| =Super + T=             | Open terminal (=ghostty=)        |
 | =Super + X=             | Open launcher (=wofi=)           |
 | =Super + E=             | Open file manager (=nemo=)       |
 | =Super + L=             | Lock screen (=swaylock=)         |
 | =Super + Q=             | Quit Hyprland                    |
 | =Super + Alt + arrows=  | Move window                      |
 | =Ctrl + Alt + T=        | Open terminal (alternative)      |
-| =Print=                 | Screenshot region to clipboard   |
+| =Print=                 | Screenshot region → annotate     |
+| =Ctrl + Print=          | Fullscreen screenshot → clipboard|
+
+* Ghostty Keybindings
+
+Ghostty is the primary terminal emulator, configured with Emacs-style
+keybinding conventions (defined in [[./dotfiles/ghostty/config][dotfiles/ghostty/config]]).
+
+| Key                     | Action                           |
+|-------------------------+----------------------------------|
+| =C-x 2=                 | Split horizontally (down)        |
+| =C-x 3=                 | Split vertically (right)         |
+| =C-x 1=                 | Zoom (maximize) current split    |
+| =C-x 0=                 | Close current split              |
+| =C-x o=                 | Next split (other-window)        |
+| =C-x k=                 | Close current split              |
+| =C-x b=                 | Tab overview                     |
+| =Alt + 1-9=             | Jump to tab 1-9                  |
+| =Ctrl+Shift+T= / =C-t=  | New tab                          |
+| =Ctrl+Shift+W=          | Close surface                    |
+| =Ctrl+Shift+Enter=      | New split (auto direction)       |
+| =Ctrl+Shift+,=           | Reload config                    |
+
+Ghostty uses the =Aura= theme with =background-opacity = 0.8= and
+=term = xterm-256color= for full compatibility when SSH-ing to remote servers.
+
+* Laboratory Server Access
+
+All SSH servers are defined in [[./hosts/nixos/home.nix][home.nix]]. Each server has two aliases:
+
++ =gsXX= / =csX= — direct connection
++ =gsXXo= / =csXo= — via bastion (jump host: =is1.astaple.com=)
+
+#+begin_src bash
+  ssh gs14       # direct
+  ssh gs14o      # via jump host
+  ssh cs1        # direct
+  ssh cs2o       # via jump host
+#+end_src
+
+SSH keepalive (=ServerAliveInterval 60=) prevents idle disconnection,
+and =AddKeysToAgent yes= caches key passphrases in memory.
+
+* GFW Bypass (Clash Verge Rev)
+
+[[https://github.com/clash-verge-rev/clash-verge-rev][clash-verge-rev]] is installed for proxy management.
+Two merge configs are provided for switching between regions:
+
+- =merge-hk.yaml=: most traffic → DIRECT, only AI services (ChatGPT, OpenAI,
+  Anthropic) → Proxy
+- =merge-cn.yaml=: subscription handles default routing, with additional
+  rules for lab servers and AI services
+
+To switch: Profiles → subscription → Edit Info → Merge → point to the desired yaml.
+
+* Input Method
+
+Fcitx5 is configured with:
++ Chinese addons (pinyin + cloud pinyin)
++ Rime support
++ Theme: =Material-Color-deepPurple=
++ Shuangpin: Ziranma profile
++ Complete pinyin.conf (fuzzy matching, keybinds, etc.) managed in [[./dotfiles/fcitx5/pinyin.conf][pinyin.conf]]
 
 * Keyboard Remap
 
@@ -174,13 +243,30 @@ All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hy
 
 Set =services.kanata.enable = false= in the module if you do not need this.
 
+* System Aliases
+
+Defined in [[./hosts/nixos/configuration.nix][configuration.nix]]:
+
+| Alias       | Command                                          |
+|------------+---------------------------------------------------|
+| =enw=       | =emacs -nw=                                      |
+| =ec=        | =emacsclient=                                    |
+| =update=    | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
+| =latexmain= | =latexmk --pdflatex main.tex=                    |
+| =gui=       | =start-hyprland=                                 |
+
 * Notes
 
 ** Super+L and logind
 
 Systemd-logind intercepts =Super+L= by default. This config adds
 =services.logind.settings= to ignore those hardware keys and let Hyprland
-handle them. See [[./hosts/nixos/configuration.nix][configuration.nix]] for the relevant block.
+handle them. See [[./hosts/nixos/configuration.nix][configuration.nix]].
+
+** Swaylock PAM
+
+=Swaylock= is configured as a PAM service (=security.pam.services.swaylock=)
+so it can unlock the screen without requiring a password policy override.
 
 ** Steam
 
@@ -188,7 +274,22 @@ Steam is enabled at the system level: =programs.steam.enable = true=.
 This automatically installs all required 32-bit libraries and the Steam
 package itself — no need to add =steam= to a package list.
 
-** Swaylock PAM
+** Ghostty Terminfo
 
-=Swaylock= is configured as a PAM service (=security.pam.services.swaylock=)
-so it can unlock the screen without requiring a password policy override.
+Ghostty's terminfo is made available via
+=environment.sessionVariables.TERMINFO_DIRS=. Additionally, =term = xterm-256color=
+in the Ghostty config ensures full compatibility when SSH-ing to remote
+servers that lack the Ghostty terminfo entry.
+
+** Unfree Packages
+
+=nixpkgs.config.allowUnfreePredicate= whitelists only the unfree packages
+actually in use (NVIDIA drivers, Steam, Discord, VS Code, WeChat, QQ, etc.).
+
+** Git Requirement
+
+The flake requires all referenced files to be tracked by Git. Before
+rebuilding, run:
+#+begin_src bash
+  git -C ~/code/NixConfig add -A
+#+end_src
