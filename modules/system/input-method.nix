@@ -5,6 +5,7 @@
       qt6Packages.fcitx5-chinese-addons
       fcitx5-rime
       fcitx5-material-color
+      fcitx5-cloudpinyin
       rime-data
       fcitx5-gtk
     ];

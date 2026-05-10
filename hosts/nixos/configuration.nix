@@ -52,6 +52,23 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (pkg.pname or "") [
+    "nvidia-x11"
+    "nvidia-settings"
+    "steam"
+    "steam-run"
+    "discord"
+    "vscode"
+    "vscode-fhs"
+    "wechat-uos"
+    "qq"
+    "wemeet"
+    "wpsoffice"
+    "corefonts"
+    "vista-fonts"
+    "google-chrome"
+    "telegram-desktop"
+  ];
 
   environment.shellAliases = {
     enw = "emacs -nw";
