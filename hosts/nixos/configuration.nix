@@ -53,6 +53,14 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  environment.shellAliases = {
+    enw = "emacs -nw";
+    update = "sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos";
+    latexmain = "latexmk --pdflatex main.tex";
+    gui = "start-hyprland";
+    ec = "emacsclient";
+  };
+
   environment.systemPackages = with pkgs; [
     vim
     wget
@@ -91,6 +99,8 @@
   };
   hardware.steam-hardware.enable = true;
   hardware.opengl.enable = true;
+
+  environment.sessionVariables.TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";
 
   system.stateVersion = "26.05";
 }
