@@ -8,6 +8,8 @@
     nerd-fonts.jetbrains-mono
     maple-mono.truetype
     sarasa-gothic
+    corefonts
+    vista-fonts
   ];
 
   fonts.fontconfig = {
