@@ -23,6 +23,7 @@
 
     grim
     slurp
+    swappy
 
     wl-clipboard
     xclip
@@ -86,6 +87,7 @@
     shotcut
     kdePackages.kdenlive
 
+    google-chrome
 
     # Terminal
     ghostty
@@ -226,5 +228,14 @@
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
   xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
+  xdg.configFile."fcitx5/conf/classicui.conf".source = ../../dotfiles/fcitx5/classicui.conf;
+  xdg.configFile."fcitx5/conf/pinyin.conf".source = ../../dotfiles/fcitx5/pinyin.conf;
+
+  home.activation.cloneEmacs = config.lib.dag.entryAfter ["writeBoundary"] ''
+    if [ ! -d "$HOME/.emacs.d/.git" ]; then
+      rm -rf "$HOME/.emacs.d"
+      ${pkgs.git}/bin/git clone https://github.com/liangzid/a.emacs.d "$HOME/.emacs.d"
+    fi
+  '';
 
 }
