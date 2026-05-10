@@ -89,6 +89,8 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
   };
+  hardware.steam-hardware.enable = true;
+  hardware.opengl.enable = true;
 
   system.stateVersion = "26.05";
 }
