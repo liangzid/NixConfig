@@ -58,6 +58,9 @@
     enchant
     gcc
 
+    zip
+    unzip
+    p7zip
 
     # Media
     imv
@@ -65,7 +68,10 @@
     termusic
     obs-studio
     vlc
+
+    # pdf
     kdePackages.okular
+    zathuraPkgs.zathuraWrapper
 
     # Develop (Just for back up)
     vscode-fhs
@@ -213,8 +219,9 @@
     };
 
     extraConfig = ''
-      ServerAliveInterval 60
-      ServerAliveCountMax 5
+      ServerAliveInterval 15
+      ServerAliveCountMax 9999999
+      TCPKeepAlive yes
       AddKeysToAgent yes
     '';
   };
