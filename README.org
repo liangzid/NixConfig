@@ -117,12 +117,213 @@ nix-config/
     └── fcitx5/{classicui,pinyin}.conf  # Input method theming & behaviour
 #+end_src
 
+* Machine-Specific Settings — Read This First
+
+This configuration was written for my personal desktop (AMD CPU + NVIDIA
+GPU + UEFI boot). Applying it directly to a different machine will fail.
+Here is everything you must check or change:
+
+** Minimal Changes Checklist
+
+| Setting                    | File                                   | What to change                             |
+|----------------------------+----------------------------------------+--------------------------------------------|
+| =hardware-configuration.nix= | [[./hosts/nixos/hardware-configuration.nix][hosts/nixos/]]                           | Regenerate — contains your disks & drivers |
+| Bootloader type            | [[./hosts/nixos/configuration.nix][configuration.nix]] L15-17               | =systemd-boot= (UEFI) or =grub= (BIOS)         |
+| NVIDIA GPU                 | [[./hosts/nixos/configuration.nix][configuration.nix]] L7                   | Remove =nvidia.nix= import if not NVIDIA     |
+| Username                   | [[./hosts/nixos/configuration.nix][configuration.nix]] L47, [[./hosts/nixos/home.nix][home.nix]] L10-11 | Change =zi= and =/home/zi= to yours            |
+| Hostname                   | [[./hosts/nixos/configuration.nix][configuration.nix]] L22                  | Change =networking.hostName=                 |
+| Timezone                   | [[./hosts/nixos/configuration.nix][configuration.nix]] L26                  | =time.timeZone= (default: Asia/Hong_Kong)     |
+| Locale                     | [[./hosts/nixos/configuration.nix][configuration.nix]] L29                  | =i18n.defaultLocale=                         |
+| SSH hosts                  | [[./hosts/nixos/home.nix][home.nix]] L130-223                      | Remove or update lab server entries        |
+| Emacs config repo          | [[./hosts/nixos/home.nix][home.nix]] L244-249                      | Change clone URL to your own emacs.d       |
+
+** Hardware Configuration (Critical)
+
+The file =hosts/nixos/hardware-configuration.nix= is *machine-specific*. It
+contains your disk layout (UUIDs), kernel modules, and CPU type. Applying
+this file to another machine will:
+
+- Fail to boot (wrong disk UUIDs)
+- Miss required kernel modules for your hardware
+- Possibly use wrong CPU microcode
+
+You *must* regenerate it on every new machine:
+
+#+begin_src bash
+  # On the target machine (or from the installer ISO, with /mnt mounted):
+  nixos-generate-config --root /
+  # Replace the repo's hardware-config with the newly generated one:
+  cp /etc/nixos/hardware-configuration.nix ~/code/NixConfig/hosts/nixos/hardware-configuration.nix
+#+end_src
+
+** Bootloader: UEFI vs BIOS
+
+This config uses =systemd-boot= with =boot.loader.efi.canTouchEfiVariables = true=.
+This *only* works on UEFI systems. If your machine boots in legacy BIOS mode:
+
+- =boot.loader.systemd-boot= has no effect (or fails silently)
+- =boot.loader.efi.canTouchEfiVariables= requires an =/sys/firmware/efi= directory (absent in BIOS)
+- You will get a silent boot failure after install
+
+If you use BIOS (or want GRUB regardless), replace lines 15-17 of [[./hosts/nixos/configuration.nix][configuration.nix]]:
+
+#+begin_src nix
+  # UEFI (current — delete this):
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  # BIOS / GRUB (replace with this):
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";        # or /dev/nvme0n1 — no partition number
+  boot.loader.grub.useOSProber = true;         # optional: detect other OSes
+#+end_src
+
+To verify your boot mode from a running system:
+
+#+begin_src bash
+  ls /sys/firmware/efi   # exists → UEFI;  fails → BIOS
+#+end_src
+
+** NVIDIA GPU
+
+If you don't have a NVIDIA GPU, *remove* the =nvidia.nix= import from
+[[./hosts/nixos/configuration.nix][configuration.nix]] line 7:
+
+#+begin_src nix
+  imports = [
+    ./hardware-configuration.nix
+    ../../modules/system/hyprland.nix
+    ../../modules/system/nvidia.nix     # ← delete or comment out this line
+    ...
+  ];
+#+end_src
+
+Also remove NVIDIA environment variables from [[./hosts/nixos/home.nix][home.nix]] lines 113-119
+(=LIBVA_DRIVER_NAME=, =GBM_BACKEND=, =__GLX_VENDOR_LIBRARY_NAME=, =WLR_NO_HARDWARE_CURSORS=).
+
+** CPU Microcode
+
+The hardware config may set =hardware.cpu.amd.updateMicrocode= or
+=hardware.cpu.intel.updateMicrocode=. These are set automatically by
+=nixos-generate-config=. Do not override them unless you know what you are doing.
+
 * Getting Started
+
+** Method A: Use the Graphical Installer First (Easier)
+
+If you don't want to manually partition disks via command line, you can
+let the NixOS graphical installer (Calamares) set up a base system, then
+apply this flake on top:
+
+1. Boot the NixOS ISO. At the boot menu, pick any desktop environment
+   (e.g. Xfce, KDE) — this only affects the *live environment*, not the
+   final system.
+
+2. Run the graphical installer. Let it handle partitioning, users,
+   timezone, etc. Pick any DE at this step too — it will be replaced
+   by the flake later.
+
+3. Reboot into the newly installed system.
+
+4. Clone this flake and apply it:
+
+   #+begin_src bash
+     git clone https://github.com/liangzid/nix-config.git ~/code/NixConfig
+     # Generate hardware config for this machine:
+     sudo nixos-generate-config --root /
+     cp /etc/nixos/hardware-configuration.nix ~/code/NixConfig/hosts/nixos/hardware-configuration.nix
+     # Review and adjust settings (see Machine-Specific Settings checklist above)
+     git -C ~/code/NixConfig add -A
+     sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos
+   #+end_src
+
+5. Reboot. The system will now be fully under this flake's control — TTY
+   login, Hyprland available via =Hyprland= or =gui=.
+
+Why this works: the installer sets up =/etc/nixos/configuration.nix=
+conventionally, but =nixos-rebuild switch --flake= declaratively replaces
+everything — bootloader, packages, services, DE — with what the flake
+defines. The disk layout from the graphical installer is preserved since
+=hardware-configuration.nix= captures it.
+
+** Method B: Manual Install from NixOS ISO (Full Control)
+
+This path does everything from the terminal — partitioning, formatting,
+mounting, and installing — using only this flake and =bootstrap.sh=.
+
+1. Download the [[https://nixos.org/download][NixOS ISO]], flash it to a USB drive, and boot from it.
+
+2. Determine your boot mode. The partition layout depends on this:
+
+   #+begin_src bash
+     ls /sys/firmware/efi   # exists → UEFI;  "No such file" → BIOS/Legacy
+   #+end_src
+
+   This tells you how the installer ISO itself booted, which is what
+   matters for the installed system. If you booted the USB in UEFI mode,
+   you need an EFI System Partition (ESP). If you booted in BIOS mode,
+   you use MBR + GRUB.
+
+3. Partition your disks. Run =lsblk= to identify your disk, then use
+   =parted=, =fdisk=, or =cfdisk=. An example for UEFI:
+
+   #+begin_src bash
+     parted /dev/nvme0n1 -- mklabel gpt
+     parted /dev/nvme0n1 -- mkpart ESP fat32 1MiB 1024MiB
+     parted /dev/nvme0n1 -- set 1 esp on
+     parted /dev/nvme0n1 -- mkpart primary ext4 1024MiB 100%
+   #+end_src
+
+   For BIOS, use an MBR label and skip the ESP partition.
+
+4. Format and mount:
+
+   #+begin_src bash
+     # UEFI
+     mkfs.fat -F 32 /dev/nvme0n1p1
+     mkfs.ext4 /dev/nvme0n1p2
+     mount /dev/nvme0n1p2 /mnt
+     mkdir -p /mnt/boot
+     mount /dev/nvme0n1p1 /mnt/boot
+
+     # BIOS (single ext4 partition on /dev/sda1)
+     mkfs.ext4 /dev/sda1
+     mount /dev/sda1 /mnt
+   #+end_src
+
+5. Edit =bootstrap.sh= and set your config directory:
+
+   #+begin_src bash
+     REPO_URL="https://github.com/liangzid/nix-config.git"
+     CONFIG_DIR="/mnt/home/zi/code/NixConfig"
+   #+end_src
+
+6. Run the install script:
+
+   #+begin_src bash
+     chmod +x bootstrap.sh
+     ./bootstrap.sh install
+   #+end_src
+
+   This will: generate hardware config → clone repo → copy the fresh hardware
+   config into the repo → run =nixos-install --flake=.  You will be asked for
+   a password for the =zi= user during install.
+
+7. After installation completes, reboot.
 
 ** On an Existing NixOS Machine
 
+WARNING: This will overwrite your current system configuration. Review the
+checklist in the Machine-Specific Settings section first.
+
 #+begin_src bash
   git clone https://github.com/liangzid/nix-config.git ~/code/NixConfig
+  # Generate hardware config for the current machine:
+  sudo nixos-generate-config --root /
+  cp /etc/nixos/hardware-configuration.nix ~/code/NixConfig/hosts/nixos/hardware-configuration.nix
+  # Git-track the new file (flake requires it):
+  git -C ~/code/NixConfig add -A
+  # Apply:
   sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos
 #+end_src
 
@@ -132,17 +333,6 @@ Or use the bootstrap script:
   ./bootstrap.sh apply
 #+end_src
 
-** Fresh Install (from NixOS ISO)
-
-#+begin_src bash
-  # 1. Partition disks and mount to /mnt
-  # 2. Run the installer
-  ./bootstrap.sh install
-#+end_src
-
-This will generate a hardware config for the new machine, clone the repo,
-and run =nixos-install --flake=.
-
 ** Tip: Quick Rebuild
 
 Use the =update= alias (defined in [[./hosts/nixos/configuration.nix][configuration.nix]]):
@@ -151,6 +341,99 @@ Use the =update= alias (defined in [[./hosts/nixos/configuration.nix][configurat
 #+end_src
 Remember to =git add= any newly created files before rebuilding, as the flake
 requires all referenced files to be Git-tracked.
+
+* Common Errors & Troubleshooting
+
+** "error: file 'hosts/nixos/hardware-configuration.nix' not found in the Nix store"
+
+The flake requires all referenced files to be tracked by Git. You probably
+added a new file or replaced =hardware-configuration.nix= but didn't commit it.
+
+#+begin_src bash
+  git -C ~/code/NixConfig add -A
+  git -C ~/code/NixConfig commit -m "update hardware config"
+#+end_src
+
+** "mount: /boot: unknown filesystem type 'vfat'" or boot hangs
+
+You installed with UEFI settings but your hardware is in BIOS/Legacy mode.
+Switch the bootloader to GRUB (see [[#bootloader-uefi-vs-bios][Bootloader section]] above). If you
+already installed, boot the NixOS ISO again, mount your root partition to
+/mnt, edit =/mnt/etc/nixos/hosts/nixos/configuration.nix= to use GRUB, then
+re-run =nixos-install --flake=.
+
+** "error: attribute 'nvidia' missing" / NVIDIA build failures
+
+If you don't have an NVIDIA GPU:
+1. Remove =../../modules/system/nvidia.nix= from the imports in
+   =hosts/nixos/configuration.nix=.
+2. Remove NVIDIA-related session variables from =hosts/nixos/home.nix=.
+
+If you do have NVIDIA but get build errors, try switching from =stable= to
+=beta= or =production= driver:
+
+#+begin_src nix
+  # In modules/system/nvidia.nix:
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  # Try instead:
+  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.beta;
+#+end_src
+
+** Bootloader not installed / "no bootable device" after reboot
+
+This usually means:
+- UEFI: the ESP wasn't mounted at =/boot= during =nixos-install=, or the ESP
+  partition type is wrong (=ef00= in gdisk, or "EFI System" in parted).
+- BIOS: GRUB wasn't installed to the MBR. Ensure =boot.loader.grub.device=
+  points to a whole disk (e.g. =/dev/sda=), not a partition (=/dev/sda1=).
+
+To fix: boot the ISO, mount everything exactly as before, and re-run
+=nixos-install --flake=.
+
+** Home-manager "user zi not found" error
+
+The =home-manager= config references the user =zi= but you changed the
+username. Update the username in *both* =configuration.nix= (=users.users.*=)
+and =home.nix= (=home.username=, =home.homeDirectory=).
+
+** "ServerAliveCountMax 9999999 is not a valid integer"
+
+Older SSH clients reject very large =ServerAliveCountMax= values. Change it
+to =ServerAliveCountMax 999= in [[./hosts/nixos/home.nix][home.nix]].
+
+** Clash / Proxy not working after rebuild
+
+=clash-verge-rev= requires a subscription URL to function. It is installed
+but not pre-configured with your subscription. Open the app → Profiles →
+add your subscription. Then point Merge to the appropriate yaml in
+=~/.config/clash-verge-rev/=.
+
+** Hyprland doesn't start (TTY only) / "start-hyprland" not found
+
+Hyprland is installed but the default session is TTY. After login, run:
+
+#+begin_src bash
+  Hyprland
+#+end_src
+
+Or use the =gui= alias (=start-hyprland=) if the system has been rebuilt
+with this config (the alias is set in =configuration.nix=).
+
+** Wofi / launcher not showing input method candidates
+
+Ensure you started =fcitx5= (add =fcitx5 -d= to your Hyprland autostart in
+[[./dotfiles/hypr/hyprland.conf][hyprland.conf]]). The environment variables =GTK_IM_MODULE=fcitx= etc. are
+set in =home.nix= but some applications need =fcitx5= running first.
+
+** WeChat / QQ fonts garbled or missing
+
+The [[./modules/system/fonts.nix][fonts.nix]] module installs CJK fonts. Additionally, WPS Office fonts
+are copied to =~/.local/share/fonts/wps-fonts= by =home.nix=. If fonts are
+still missing, run:
+
+#+begin_src bash
+  fc-cache -fv
+#+end_src
 
 * Hyprland Keybindings
 
