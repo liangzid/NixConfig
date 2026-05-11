@@ -1,0 +1,546 @@
+#+title: NixOS 配置仓库
+#+date: Sat May  9 12:11:30 2026
+#+author: Zi Liang
+#+email: zi1415926.liang@connect.polyu.hk
+
+[[file:./images/screenshot_20260509_125220.png]]
+
+[[file:./images/screenshot_20260509_125139.png]]
+
+[[file:./images/screenshot_20260509_125317.png]]
+
+[[file:./images/screenshot_20260509_125943.png]]
+
+我花了三天时间，把之前的 Linux 配置和开发环境全部迁移到了 NixOS。
+
+这篇文档既是个人笔记，也是本仓库的 README。
+
+（英文原版请见 [[./README.org][README.org]]。）
+
+* 什么是 NixOS？
+
+NixOS 是基于 =Nix= 构建的特殊 Linux 发行版。
+
+Nix 是什么？
+
+Nix 既是：
++ 一门函数式编程语言，也是解决配置问题的 DSL
++ 一个包管理工具
++ 一个操作系统
+
+Nix/NixOS 的核心理念：
++ 系统中的一切都可以被描述，借助函数式定义的特性，系统可以被轻松复现
++ 类似于 =git=，Nix/NixOS 用更高效的方式管理不同版本的包及其依赖——同一个程序的两个版本可以共存
++ 不同于快照方案，NixOS 允许引导任意版本的构建，因此再也不用担心系统崩溃
++ 我使用它的原因：希望配置是 =可积累的=；享受这种方式，就像我喜欢用 Emacs 一样
+
+* 本配置包含什么？
+
+这是一套我为新桌面环境准备的最小化配置。
+
+默认是 TTY 环境，但内置了一套非常漂亮、健壮且便捷的 DESKTOP 开发环境。
+
+|-----------+------------------------------------|
+| 组件      | 方案                               |
+|-----------+------------------------------------|
+| 系统      | NixOS (26.05)                      |
+| 使用Flake? | 是                                |
+| 默认环境  | TTY                                |
+| 桌面环境  | Wayland                            |
+| 桌面      | Hyprland                           |
+| 启动器    | wofi                               |
+| 状态栏    | waybar                             |
+| 终端      | ghostty                            |
+| 文件管理  | nemo*                              |
+| 通知      | dunst/libnotify                    |
+| GTK主题   | juno-theme                         |
+| 图标      | beauty-line-icon                   |
+| 截图      | grim/slurp/swappy                  |
+| 壁纸      | awww                               |
+| 编辑器    | emacs/vim                          |
+| Agent     | opencode                           |
+| VPN/代理  | clash-verge-rev                    |
+|-----------+------------------------------------|
+
+注：此列表会持续更新。
+
+** 中文输入与通讯
+
++ 输入法：=fcitx5= + =rime= + =pinyin=，主题：=Material-Color-deepPurple=
++ 通讯：=wechat-uos=、=qq=
++ VPN：=clash-verge-rev=
+
+** Emacs
+
+Emacs 从 [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] 拉取，提供最新的 =emacs-unstable-pgtk= 构建，原生支持 Wayland。
+Emacs 配置在首次构建时通过 =home.activation= 从 [[https://github.com/liangzid/a.emacs.d][a.emacs.d]] 自动克隆。
+
+* 仓库结构
+
+#+begin_src text
+nix-config/
+├── flake.nix                 # 入口 — 定义 inputs 与 NixOS 配置
+├── flake.lock                # 锁定的 input 版本
+├── bootstrap.sh              # 安装 / 应用 / 构建 ISO
+├── hosts/
+│   └── nixos/
+│       ├── configuration.nix # 系统级配置（引导、用户、包、ssh、steam）
+│       ├── hardware-configuration.nix
+│       └── home.nix          # 用户级配置（包、环境变量、dotfiles、ssh 主机）
+├── modules/
+│   ├── system/               # 可复用的系统模块
+│   │   ├── hyprland.nix      # Hyprland 窗口管理器 + xwayland
+│   │   ├── nvidia.nix        # NVIDIA 显卡 + modesetting
+│   │   ├── fonts.nix         # 中文字体 + nerd 字体
+│   │   ├── input-method.nix  # fcitx5 + rime + cloudpinyin + 主题
+│   │   ├── pipewire.nix      # 音频：pipewire + alsa + pulse
+│   │   ├── portal.nix        # Wayland 的 XDG 桌面门户
+│   │   └── kanata.nix        # CapsLock → Control 映射
+│   └── home/                 # 可复用的 home-manager 模块
+│       ├── emacs.nix         # Emacs + vterm
+│       ├── waybar.nix        # 状态栏（tokyonight 主题）
+│       └── gtk.nix           # GTK 主题 + 深色模式
+└── dotfiles/                 # 由 home-manager 管理的配置文件
+    ├── hypr/hyprland.conf    # Hyprland 快捷键 + 自启动
+    ├── wofi/{config,style.css}
+    ├── ghostty/config        # 终端（Emacs 风格快捷键 + Aura 主题）
+    ├── clash/merge-hk.yaml   # 翻墙规则（香港模式）
+    ├── clash/merge-cn.yaml   # 翻墙规则（大陆模式）
+    └── fcitx5/{classicui,pinyin}.conf  # 输入法主题与行为
+#+end_src
+
+* 机器相关配置 — 务必先读
+
+此配置是为我的个人台式机编写的（AMD CPU + NVIDIA 显卡 + UEFI 引导）。
+直接在其他机器上套用一定会失败。以下是必须检查或修改的内容：
+
+** 最小修改清单
+
+| 配置项                    | 文件                                      | 需要修改的内容                               |
+|--------------------------+------------------------------------------+---------------------------------------------|
+| =hardware-configuration.nix= | [[./hosts/nixos/hardware-configuration.nix][hosts/nixos/]]   | 重新生成 — 包含磁盘与驱动信息               |
+| 引导方式                  | [[./hosts/nixos/configuration.nix][configuration.nix]] L15-17 | =systemd-boot=（UEFI）或 =grub=（BIOS）       |
+| NVIDIA 显卡               | [[./hosts/nixos/configuration.nix][configuration.nix]] L7   | 非 NVIDIA 显卡请删除 =nvidia.nix= 导入        |
+| 用户名                    | [[./hosts/nixos/configuration.nix][configuration.nix]] L47, [[./hosts/nixos/home.nix][home.nix]] L10-11 | 将 =zi= 与 =/home/zi= 改为你的用户名          |
+| 主机名                    | [[./hosts/nixos/configuration.nix][configuration.nix]] L22 | 修改 =networking.hostName=                   |
+| 时区                      | [[./hosts/nixos/configuration.nix][configuration.nix]] L26 | =time.timeZone=（默认：Asia/Hong_Kong）       |
+| 语言/区域                 | [[./hosts/nixos/configuration.nix][configuration.nix]] L29 | =i18n.defaultLocale=                         |
+| SSH 主机                  | [[./hosts/nixos/home.nix][home.nix]] L130-223          | 删除或修改实验室服务器条目                   |
+| Emacs 配置仓库            | [[./hosts/nixos/home.nix][home.nix]] L244-249          | 改为你自己的 emacs.d 仓库地址               |
+
+** 硬件配置（至关重要）
+
+=hosts/nixos/hardware-configuration.nix= 是*机器相关的*。它包含磁盘布局
+（分区UUID）、内核模块、CPU 类型等。在另一台机器上套用此文件会导致：
+
+- 无法启动（磁盘 UUID 错误）
+- 缺少硬件所需的内核模块
+- 可能使用错误的 CPU 微码
+
+*每台新机器都必须重新生成*一份：
+
+#+begin_src bash
+  # 在目标机器上（或从安装 ISO 启动，/mnt 已挂载时）：
+  nixos-generate-config --root /
+  # 将新生成的硬件配置替换仓库中的：
+  cp /etc/nixos/hardware-configuration.nix ~/code/NixConfig/hosts/nixos/hardware-configuration.nix
+#+end_src
+
+** 引导方式：UEFI vs BIOS
+
+此配置使用 =systemd-boot= 和 =boot.loader.efi.canTouchEfiVariables = true=，
+仅适用于 UEFI 系统。如果你的机器是传统 BIOS 引导：
+
+- =boot.loader.systemd-boot= 无效（或静默失败）
+- =boot.loader.efi.canTouchEfiVariables= 需要 =/sys/firmware/efi= 目录（BIOS 下不存在）
+- 安装后无法启动
+
+如果你使用 BIOS（或无论如何都想用 GRUB），将 [[./hosts/nixos/configuration.nix][configuration.nix]] 第15-17行替换为：
+
+#+begin_src nix
+  # UEFI（当前配置 — 删掉）：
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  # BIOS / GRUB（替换为）：
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";        # 或 /dev/nvme0n1 — 不带分区号
+  boot.loader.grub.useOSProber = true;         # 可选：检测其他操作系统
+#+end_src
+
+在运行中的系统上确认引导方式：
+
+#+begin_src bash
+  ls /sys/firmware/efi   # 存在 → UEFI；失败 → BIOS
+#+end_src
+
+** NVIDIA 显卡
+
+如果你没有 NVIDIA 显卡，请从 [[./hosts/nixos/configuration.nix][configuration.nix]] 第7行*删除* =nvidia.nix= 导入：
+
+#+begin_src nix
+  imports = [
+    ./hardware-configuration.nix
+    ../../modules/system/hyprland.nix
+    ../../modules/system/nvidia.nix     # ← 删除或注释此行
+    ...
+  ];
+#+end_src
+
+同时从 [[./hosts/nixos/home.nix][home.nix]] 第113-119行删除 NVIDIA 相关的环境变量
+（=LIBVA_DRIVER_NAME=、=GBM_BACKEND=、=__GLX_VENDOR_LIBRARY_NAME=、=WLR_NO_HARDWARE_CURSORS=）。
+
+** CPU 微码
+
+硬件配置可能会设置 =hardware.cpu.amd.updateMicrocode= 或
+=hardware.cpu.intel.updateMicrocode=。这些由 =nixos-generate-config=
+自动设置。除非你清楚自己在做什么，否则不要手动覆盖。
+
+* 快速开始
+
+** 方法 A：先用图形化安装器安装（更简单）
+
+如果你不想手动敲命令分区，可以先让 NixOS 图形化安装器（Calamares）装好一个基础系统，再在此基础上应用此 flake：
+
+1. 启动 NixOS ISO。在引导菜单选择任意桌面环境（如 Xfce、KDE）——
+   这仅影响*安装时的操作环境*，不影响最终系统。
+
+2. 运行图形化安装器。让它自动完成分区、用户创建、时区设置等。
+   此时也可以选任意桌面环境 — flake 应用后会将其替换。
+
+3. 重启进入新安装的系统。
+
+4. 克隆本仓库并应用 flake：
+
+   #+begin_src bash
+     git clone https://github.com/liangzid/nix-config.git ~/code/NixConfig
+     # 为当前机器生成硬件配置：
+     sudo nixos-generate-config --root /
+     cp /etc/nixos/hardware-configuration.nix ~/code/NixConfig/hosts/nixos/hardware-configuration.nix
+     # 检查并调整配置（参见上面的机器相关配置清单）
+     git -C ~/code/NixConfig add -A
+     sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos
+   #+end_src
+
+5. 重启。系统现在完全由此 flake 管理 — TTY 登录，输入 =Hyprland= 或 =gui= 即可启动桌面环境。
+
+原理：安装器在 =/etc/nixos/configuration.nix= 中写入了传统配置，但
+=nixos-rebuild switch --flake= 会声明式地替换一切 — 引导程序、包、服务、
+桌面环境 — 全部由 flake 决定。图形化安装器所做的磁盘布局则被
+=hardware-configuration.nix= 捕获并保留。
+
+** 方法 B：从 NixOS ISO 手动安装（完全控制）
+
+此路径完全在终端中操作 — 分区、格式化、挂载、安装 — 只使用此 flake 和
+=bootstrap.sh=。
+
+1. 下载 [[https://nixos.org/download][NixOS ISO]]，烧录到 U 盘并启动。
+
+2. 确认引导方式。分区方案取决于此：
+
+   #+begin_src bash
+     ls /sys/firmware/efi   # 存在 → UEFI；"No such file" → BIOS/Legacy
+   #+end_src
+
+   这反映了安装 ISO 自身的引导方式，也决定了最终系统的引导方式。
+   UEFI 模式需创建 EFI 系统分区（ESP），BIOS 模式则使用 MBR + GRUB。
+
+3. 分区。先用 =lsblk= 确认磁盘名，再用 =parted=、=fdisk= 或 =cfdisk=。
+   UEFI 示例：
+
+   #+begin_src bash
+     parted /dev/nvme0n1 -- mklabel gpt
+     parted /dev/nvme0n1 -- mkpart ESP fat32 1MiB 1024MiB
+     parted /dev/nvme0n1 -- set 1 esp on
+     parted /dev/nvme0n1 -- mkpart primary ext4 1024MiB 100%
+   #+end_src
+
+   BIOS 模式使用 MBR 分区表，不需要 ESP 分区。
+
+4. 格式化并挂载：
+
+   #+begin_src bash
+     # UEFI
+     mkfs.fat -F 32 /dev/nvme0n1p1
+     mkfs.ext4 /dev/nvme0n1p2
+     mount /dev/nvme0n1p2 /mnt
+     mkdir -p /mnt/boot
+     mount /dev/nvme0n1p1 /mnt/boot
+
+     # BIOS（单个 ext4 分区 /dev/sda1）
+     mkfs.ext4 /dev/sda1
+     mount /dev/sda1 /mnt
+   #+end_src
+
+5. 编辑 =bootstrap.sh=，设置配置目录：
+
+   #+begin_src bash
+     REPO_URL="https://github.com/liangzid/nix-config.git"
+     CONFIG_DIR="/mnt/home/zi/code/NixConfig"
+   #+end_src
+
+6. 运行安装脚本：
+
+   #+begin_src bash
+     chmod +x bootstrap.sh
+     ./bootstrap.sh install
+   #+end_src
+
+   脚本将依次：生成硬件配置 → 克隆仓库 → 替换为刚生成的硬件配置 →
+   执行 =nixos-install --flake=。安装过程中会提示为 =zi= 用户设置密码。
+
+7. 安装完成后重启。
+
+** 在已有 NixOS 的机器上使用
+
+警告：这会覆盖你当前的系统配置。请先阅读上面的「机器相关配置清单」。
+
+#+begin_src bash
+  git clone https://github.com/liangzid/nix-config.git ~/code/NixConfig
+  # 为当前机器生成硬件配置：
+  sudo nixos-generate-config --root /
+  cp /etc/nixos/hardware-configuration.nix ~/code/NixConfig/hosts/nixos/hardware-configuration.nix
+  # Git 追踪新文件（flake 要求）：
+  git -C ~/code/NixConfig add -A
+  # 应用：
+  sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos
+#+end_src
+
+或使用 bootstrap 脚本：
+
+#+begin_src bash
+  ./bootstrap.sh apply
+#+end_src
+
+** 快速重建
+
+使用 =update= 别名（定义在 [[./hosts/nixos/configuration.nix][configuration.nix]]）：
+#+begin_src bash
+  update
+#+end_src
+记住在重建前 =git add= 所有新文件，因为 flake 要求所有引用的文件被 Git 追踪。
+
+* 常见错误与排查
+
+** "error: file 'hosts/nixos/hardware-configuration.nix' not found in the Nix store"
+
+flake 要求所有引用的文件被 Git 追踪。你可能新增或替换了
+=hardware-configuration.nix= 但没有 git add。
+
+#+begin_src bash
+  git -C ~/code/NixConfig add -A
+  git -C ~/code/NixConfig commit -m "update hardware config"
+#+end_src
+
+** "mount: /boot: unknown filesystem type 'vfat'" 或启动卡住
+
+你用了 UEFI 配置但你的机器是 BIOS/Legacy 引导。将引导程序切换为 GRUB
+（见上文 Bootloader 章节）。如果已经安装了，重新启动 NixOS ISO，将
+根分区挂载到 /mnt，修改 =/mnt/etc/nixos/hosts/nixos/configuration.nix=
+使用 GRUB，然后重新运行 =nixos-install --flake=。
+
+** "error: attribute 'nvidia' missing" / NVIDIA 构建失败
+
+如果你没有 NVIDIA 显卡：
+1. 从 =hosts/nixos/configuration.nix= 的 imports 中删除 =../../modules/system/nvidia.nix=。
+2. 从 =hosts/nixos/home.nix= 中删除 NVIDIA 相关的环境变量。
+
+如果你有 NVIDIA 但构建失败，尝试切换驱动版本：
+
+#+begin_src nix
+  # 在 modules/system/nvidia.nix 中：
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  # 尝试改为：
+  # hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.beta;
+#+end_src
+
+** 引导程序未安装 / 重启后 "no bootable device"
+
+通常这意味着：
+- UEFI：=nixos-install= 时 ESP 没有挂载到 =/boot=，或者 ESP 分区类型不对
+  （gdisk 中应为 =ef00=，parted 中应为 "EFI System"）。
+- BIOS：GRUB 没有安装到 MBR。确保 =boot.loader.grub.device=
+  指向整块磁盘（如 =/dev/sda=），而不是分区（=/dev/sda1=）。
+
+修复方法：启动 ISO，和之前一样挂载所有分区，重新运行 =nixos-install --flake=。
+
+** Home-manager 报 "user zi not found" 错误
+
+=home-manager= 配置引用的是用户 =zi=，但你改了用户名。请在
+=configuration.nix=（=users.users.*=）和 =home.nix=
+（=home.username=、=home.homeDirectory=）*两处*同步修改。
+
+** "ServerAliveCountMax 9999999 is not a valid integer"
+
+较旧的 SSH 客户端不接受过大的 =ServerAliveCountMax= 值。
+在 [[./hosts/nixos/home.nix][home.nix]] 中改为 =ServerAliveCountMax 999=。
+
+** Clash / 代理重建后无法使用
+
+=clash-verge-rev= 需要订阅链接才能工作。它已被安装但不会预先配置你的订阅。
+打开 Clash → Profiles → 添加你的订阅。然后设置 Merge 指向
+=~/.config/clash-verge-rev/= 中对应的 yaml 文件。
+
+** Hyprland 无法启动（只有 TTY） / "start-hyprland" 找不到
+
+Hyprland 已安装，但默认会话是 TTY。登录后运行：
+
+#+begin_src bash
+  Hyprland
+#+end_src
+
+或使用 =gui= 别名（=start-hyprland=），前提是系统已用此配置构建过
+（别名在 =configuration.nix= 中定义）。
+
+** Wofi / 启动器不显示输入法候选词
+
+确保 =fcitx5= 已在运行（在 [[./dotfiles/hypr/hyprland.conf][hyprland.conf]] 的 Hyprland 自启动中加入
+=fcitx5 -d=）。环境变量 =GTK_IM_MODULE=fcitx= 等已在 =home.nix= 中配置，
+但部分应用需要 =fcitx5= 先启动。
+
+** WeChat / QQ 字体乱码或缺失
+
+[[./modules/system/fonts.nix][fonts.nix]] 模块安装了中文字体。此外，WPS 字体由 =home.nix=
+复制到 =~/.local/share/fonts/wps-fonts=。如果字体仍未生效，运行：
+
+#+begin_src bash
+  fc-cache -fv
+#+end_src
+
+* Hyprland 快捷键
+
+所有快捷键定义在 [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hyprland.conf]] 中。
+
+| 快捷键                  | 操作                             |
+|------------------------+----------------------------------|
+| =Super + 方向键=        | 切换焦点                         |
+| =Super + Tab=          | 轮换窗口                         |
+| =Super + 1-0=          | 切换到工作区 1-10                |
+| =Super + Shift + 1-0=  | 将窗口移至工作区 1-10            |
+| =Super + K=            | 关闭活动窗口                     |
+| =Super + V=            | 切换浮动模式                     |
+| =Super + F=            | 切换全屏                         |
+| =Super + R=            | 进入缩放模式（方向键 / HJKL）    |
+| =Super + T=            | 打开终端 (=ghostty=)             |
+| =Super + X=            | 打开启动器 (=wofi=)              |
+| =Super + E=            | 打开文件管理器 (=nemo=)          |
+| =Super + L=            | 锁屏 (=swaylock=)                |
+| =Super + Q=            | 退出 Hyprland                    |
+| =Super + Alt + 方向键= | 移动窗口                         |
+| =Ctrl + Alt + T=       | 打开终端（备用）                 |
+| =Print=                | 区域截图 → 标注                  |
+| =Ctrl + Print=         | 全屏截图 → 剪贴板                |
+
+* Ghostty 快捷键
+
+Ghostty 是主终端模拟器，配置为 Emacs 风格快捷键
+（定义在 [[./dotfiles/ghostty/config][dotfiles/ghostty/config]] 中）。
+
+| 快捷键                   | 操作                       |
+|-------------------------+----------------------------|
+| =C-x 2=                 | 水平分割（下方）           |
+| =C-x 3=                 | 垂直分割（右方）           |
+| =C-x 1=                 | 最大化当前分割             |
+| =C-x 0=                 | 关闭当前分割               |
+| =C-x o=                 | 下一个分割                 |
+| =C-x k=                 | 关闭当前分割               |
+| =C-x b=                 | 标签页总览                 |
+| =Alt + 1-9=             | 跳转到标签页 1-9           |
+| =Ctrl+Shift+T= / =C-t=  | 新建标签页                 |
+| =Ctrl+Shift+W=          | 关闭窗口                   |
+| =Ctrl+Shift+Enter=      | 新建分割（自动方向）       |
+| =Ctrl+Shift+,=          | 重新加载配置               |
+
+Ghostty 使用 =Aura= 主题，=background-opacity = 0.8=，且
+=term = xterm-256color= 以保证 SSH 到远程服务器时的兼容性。
+
+* 实验室服务器访问
+
+所有 SSH 服务器定义在 [[./hosts/nixos/home.nix][home.nix]] 中。每个服务器有两个别名：
+
++ =gsXX= / =csX= — 直连
++ =gsXXo= / =csXo= — 通过跳板机（bastion: =is1.astaple.com=）
+
+#+begin_src bash
+  ssh gs14       # 直连
+  ssh gs14o      # 通过跳板机
+  ssh cs1        # 直连
+  ssh cs2o       # 通过跳板机
+#+end_src
+
+SSH 保活（=ServerAliveInterval 60=）防止空闲断开，
+=AddKeysToAgent yes= 将密钥密码缓存在内存中。
+
+* 翻墙（Clash Verge Rev）
+
+已安装 [[https://github.com/clash-verge-rev/clash-verge-rev][clash-verge-rev]] 用于代理管理。
+提供两个 Merge 配置用于切换地区：
+
+- =merge-hk.yaml=：大部分流量 → DIRECT，仅 AI 服务（ChatGPT、OpenAI、
+  Anthropic）→ Proxy
+- =merge-cn.yaml=：订阅处理默认路由，额外规则处理实验室服务器和 AI 服务
+
+切换方法：Profiles → 订阅 → Edit Info → Merge → 选择对应的 yaml。
+
+* 输入法
+
+Fcitx5 配置包括：
++ 中文插件（pinyin + cloud pinyin）
++ Rime 支持
++ 主题：=Material-Color-deepPurple=
++ 双拼：自然码方案
++ 完整的 pinyin.conf（模糊匹配、快捷键等）在 [[./dotfiles/fcitx5/pinyin.conf][pinyin.conf]] 中
+
+* 键盘映射
+
+=CapsLock= 通过 [[https://github.com/jtroo/kanata][kanata]] 映射为 =Control=（配置在 [[./modules/system/kanata.nix][modules/system/kanata.nix]] 中）。
+
+如果不需要，在模块中设置 =services.kanata.enable = false=。
+
+* 系统别名
+
+定义在 [[./hosts/nixos/configuration.nix][configuration.nix]] 中：
+
+| 别名        | 命令                                              |
+|------------+---------------------------------------------------|
+| =enw=      | =emacs -nw=                                       |
+| =ec=       | =emacsclient=                                     |
+| =update=   | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
+| =latexmain= | =latexmk --pdflatex main.tex=                    |
+| =gui=      | =start-hyprland=                                  |
+
+* 注意事项
+
+** Super+L 与 logind
+
+Systemd-logind 默认拦截 =Super+L=。此配置通过
+=services.logind.settings= 忽略这些硬件按键，交由 Hyprland 处理。
+参见 [[./hosts/nixos/configuration.nix][configuration.nix]]。
+
+** Swaylock PAM
+
+=Swaylock= 配置了 PAM 服务（=security.pam.services.swaylock=），
+可以在不需要密码策略覆盖的情况下解锁屏幕。
+
+** Steam
+
+Steam 在系统级别启用：=programs.steam.enable = true=。
+这会自动安装所有必需的 32 位库和 Steam 本体 — 无需将 =steam= 加入包列表。
+
+** Ghostty Terminfo
+
+Ghostty 的 terminfo 通过 =environment.sessionVariables.TERMINFO_DIRS=
+提供。此外，Ghostty 配置中 =term = xterm-256color= 保证 SSH 到远程服务器
+（没有 Ghostty terminfo 条目）时的完全兼容性。
+
+** 非自由软件包
+
+=nixpkgs.config.allowUnfreePredicate= 仅白名单实际使用的非自由软件包
+（NVIDIA 驱动、Steam、Discord、VS Code、WeChat、QQ 等）。
+
+** Git 要求
+
+flake 要求所有引用的文件被 Git 追踪。重建前请运行：
+#+begin_src bash
+  git -C ~/code/NixConfig add -A
+#+end_src
