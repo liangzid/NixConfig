@@ -17,6 +17,8 @@ I spent -two- three days to move my previous linux configuration and development
 
 This document is the note of it, also performing as the README file.
 
+（中文版请见 [[./README.zh.org][README.zh.org]]。）
+
 * What is NixOS?
 
 NixOS is a special Linux distro built upon the =Nix=.
