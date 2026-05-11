@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="https://github.com/YOUR_USERNAME/nix-config.git"
+REPO_URL="https://github.com/liangzid/nix-config.git"
 CONFIG_DIR="/home/zi/code/NixConfig"
 FLAKE_REF=".#nixos"
 
