@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_URL="https://github.com/YOUR_USERNAME/nix-config.git"
+REPO_URL="https://github.com/liangzid/nix-config.git"
 CONFIG_DIR="/home/zi/code/NixConfig"
 FLAKE_REF=".#nixos"
 
@@ -40,18 +40,33 @@ cmd_install() {
   # Generate hardware config for target machine
   nixos-generate-config --root /mnt
 
-  # Clone config
-  mkdir -p /mnt/etc/nixos
-  git clone "$REPO_URL" /mnt/etc/nixos
+  # Determine install target (default: clone to /mnt/home/USER/code/NixConfig)
+  TARGET_DIR="${CONFIG_DIR/#\/home\/zi/\/mnt\/home\/zi}"
+  echo "==> Cloning config to $TARGET_DIR ..."
+  mkdir -p "$(dirname "$TARGET_DIR")"
+  git clone "$REPO_URL" "$TARGET_DIR"
 
-  # Replace the auto-generated hardware-config with the one we just generated
-  cp /mnt/etc/nixos/hosts/nixos/hardware-configuration.nix /mnt/etc/nixos/hosts/nixos/hardware-configuration.nix.bak 2>/dev/null || true
-  cp /mnt/nixos/hardware-configuration.nix /mnt/etc/nixos/hosts/nixos/hardware-configuration.nix
+  # Replace the repo's hardware-config with the one we just generated
+  HW_GENERATED="/mnt/etc/nixos/hardware-configuration.nix"
+  HW_TARGET="$TARGET_DIR/hosts/nixos/hardware-configuration.nix"
+  cp "$HW_TARGET" "${HW_TARGET}.bak" 2>/dev/null || true
+  cp "$HW_GENERATED" "$HW_TARGET"
+
+  # Also keep a copy at /mnt/etc/nixos for reference
+  mkdir -p /mnt/etc/nixos
+  cp "$HW_GENERATED" /mnt/etc/nixos/hardware-configuration.nix.bak 2>/dev/null || true
+
+  # Git-track the new hardware config so the flake can see it
+  git -C "$TARGET_DIR" add -A
+  git -C "$TARGET_DIR" config user.email "installer@nixos"
+  git -C "$TARGET_DIR" config user.name "NixOS Installer"
+  git -C "$TARGET_DIR" commit -m "install: add hardware-config for this machine"
 
   # Install
-  nixos-install --flake /mnt/etc/nixos#"$FLAKE_REF"
+  nixos-install --flake "$TARGET_DIR#$FLAKE_REF"
 
   echo "==> Installation complete! Reboot and enjoy."
+  echo "    After reboot, the config will be at ${TARGET_DIR#/mnt}."
 }
 
 cmd_iso() {
