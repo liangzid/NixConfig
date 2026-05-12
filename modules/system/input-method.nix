@@ -7,6 +7,7 @@
       fcitx5-material-color
       rime-data
       fcitx5-gtk
+      qt6Packages.fcitx5-qt
     ];
   };
 }

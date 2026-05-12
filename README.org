@@ -459,7 +459,9 @@ All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hy
 | =Super + Alt + arrows=  | Move window                      |
 | =Ctrl + Alt + T=        | Open terminal (alternative)      |
 | =Print=                 | Screenshot region → annotate     |
+| =Calculator=            | Screenshot region → annotate     |
 | =Ctrl + Print=          | Fullscreen screenshot → clipboard|
+| =Ctrl + Calculator=     | Fullscreen screenshot → clipboard|
 
 * Ghostty Keybindings
 
