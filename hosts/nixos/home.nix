@@ -216,11 +216,15 @@
         user = "zi";
         proxyJump = "bastion";
       };
+      "moreoverai" = {
+        hostname = "139.59.220.113";
+        user = "ronghua";
+      };
     };
 
     extraConfig = ''
       ServerAliveInterval 15
-      ServerAliveCountMax 9999999
+      ServerAliveCountMax 8
       TCPKeepAlive yes
       AddKeysToAgent yes
     '';
