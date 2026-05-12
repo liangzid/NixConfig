@@ -141,7 +141,7 @@
   programs.ssh = {
     enable = true;
     matchBlocks = {
-      "bastion" = {
+      "is1" = {
         hostname = "is1.astaple.com";
         user = "zi";
       };
@@ -152,7 +152,7 @@
       "gs10o" = {
         hostname = "gs10.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "gs11" = {
         hostname = "gs11.astaple.com";
@@ -161,7 +161,7 @@
       "gs11o" = {
         hostname = "gs11.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "gs12" = {
         hostname = "gs12.astaple.com";
@@ -170,7 +170,7 @@
       "gs12o" = {
         hostname = "gs12.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "gs13" = {
         hostname = "gs13.astaple.com";
@@ -179,7 +179,7 @@
       "gs13o" = {
         hostname = "gs13.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "gs14" = {
         hostname = "gs14.astaple.com";
@@ -188,7 +188,7 @@
       "gs14o" = {
         hostname = "gs14.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "gs15" = {
         hostname = "gs15.astaple.com";
@@ -197,7 +197,7 @@
       "gs15o" = {
         hostname = "gs15.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "gs16" = {
         hostname = "gs16.astaple.com";
@@ -206,7 +206,7 @@
       "gs16o" = {
         hostname = "gs16.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "cs1" = {
         hostname = "cs1.astaple.com";
@@ -215,7 +215,7 @@
       "cs1o" = {
         hostname = "cs1.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "cs2" = {
         hostname = "cs2.astaple.com";
@@ -224,7 +224,7 @@
       "cs2o" = {
         hostname = "cs2.astaple.com";
         user = "zi";
-        proxyJump = "bastion";
+        proxyJump = "is1";
       };
       "moreoverai" = {
         hostname = "139.59.220.113";

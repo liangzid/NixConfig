@@ -24,4 +24,14 @@ for host in is1 gs14 gs14o; do
   ssh-copy-id -i "$KEYFILE.pub" "$host"
 done
 
+echo "==> Cloning commonly used repositories..."
+cd "$HOME"
+for repo in orgtodo worklog liangzid.github.io; do
+  if [ -d "$HOME/$repo" ]; then
+    echo "Repository $repo already exists at $HOME/$repo, skipping."
+  else
+    git clone "https://github.com/liangzid/$repo"
+  fi
+done
+
 echo "==> Done."
