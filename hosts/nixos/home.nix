@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, hermes-agent, ... }:
 
 {
   imports = [
@@ -99,6 +99,8 @@
     ghostty
     wezterm
     zellij
+
+    hermes-agent.packages.${pkgs.system}.default
   ];
 
   home.shellAliases = {

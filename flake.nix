@@ -8,9 +8,13 @@
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
     eamcs-overlay.url = "github:nix-community/emacs-overlay";
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, ... }: {
+  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, hermes-agent, ... }: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
@@ -26,7 +30,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.zi = import ./hosts/nixos/home.nix;
-          home-manager.extraSpecialArgs = { inherit hyprland; };
+          home-manager.extraSpecialArgs = { inherit hyprland hermes-agent; };
         }
       ];
     };
