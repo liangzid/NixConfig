@@ -429,7 +429,9 @@ Hyprland 已安装，但默认会话是 TTY。登录后运行：
 | =Super + Alt + 方向键= | 移动窗口                         |
 | =Ctrl + Alt + T=       | 打开终端（备用）                 |
 | =Print=                | 区域截图 → 标注                  |
+| =Calculator=           | 区域截图 → 标注                  |
 | =Ctrl + Print=         | 全屏截图 → 剪贴板                |
+| =Ctrl + Calculator=    | 全屏截图 → 剪贴板                |
 
 * Ghostty 快捷键
 
