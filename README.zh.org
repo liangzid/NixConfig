@@ -51,7 +51,7 @@ Nix/NixOS 的核心理念：
 | 启动器    | wofi                               |
 | 状态栏    | waybar                             |
 | 终端      | ghostty                            |
-| 文件管理  | nemo*                              |
+| 文件管理  | yazi                               |
 | 通知      | dunst/libnotify                    |
 | GTK主题   | juno-theme                         |
 | 图标      | beauty-line-icon                   |
@@ -423,7 +423,7 @@ Hyprland 已安装，但默认会话是 TTY。登录后运行：
 | =Super + R=            | 进入缩放模式（方向键 / HJKL）    |
 | =Super + T=            | 打开终端 (=ghostty=)             |
 | =Super + X=            | 打开启动器 (=wofi=)              |
-| =Super + E=            | 打开文件管理器 (=nemo=)          |
+| =Super + E=            | 打开文件管理器 (=yazi=)           |
 | =Super + L=            | 锁屏 (=swaylock=)                |
 | =Super + Q=            | 退出 Hyprland                    |
 | =Super + Alt + 方向键= | 移动窗口                         |

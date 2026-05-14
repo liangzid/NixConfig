@@ -1,0 +1,27 @@
+[manager]
+show_hidden = true
+sort_by = "alphabetical"
+sort_dir_first = true
+linemode = "size"
+
+[preview]
+image_filter = "kitty"
+max_width = 1000
+max_height = 600
+cache_dir = ""
+
+[opener]
+open = [
+	{ run = 'xdg-open "$0"', desc = "Open with default" },
+]
+play = [
+	{ run = 'mpv "$@"', block = true, orphan = true, desc = "Play with mpv" },
+]
+edit = [
+	{ run = 'emacsclient -n "$@"', block = false, desc = "Edit with Emacs" },
+]
+
+[tasks]
+image_alloc = 536870912
+image_bound = [ 2, 1 ]
+suppress_preload = false

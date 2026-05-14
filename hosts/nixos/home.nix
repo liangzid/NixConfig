@@ -14,7 +14,7 @@
   home.packages = with pkgs; [
     wofi
     waybar
-    nemo
+    yazi
     dunst
     libnotify
 
@@ -45,6 +45,10 @@
     ripgrep
     silver-searcher
     uv
+
+    gh
+    yazi
+    
 
     pkg-config
     glib
@@ -242,13 +246,36 @@
     '';
   };
 
-  xdg.mimeApps.enable = true;
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = ["firefox.desktop"];
+      "x-scheme-handler/http" = ["firefox.desktop"];
+      "x-scheme-handler/https" = ["firefox.desktop"];
+      "application/pdf" = ["org.kde.okular.desktop"];
+      "image/png" = ["imv.desktop"];
+      "image/jpeg" = ["imv.desktop"];
+      "image/gif" = ["imv.desktop"];
+      "image/webp" = ["imv.desktop"];
+      "image/svg+xml" = ["imv.desktop"];
+      "video/mp4" = ["mpv.desktop"];
+      "video/x-matroska" = ["mpv.desktop"];
+      "video/webm" = ["mpv.desktop"];
+      "text/plain" = ["emacsclient.desktop"];
+      "text/x-python" = ["emacsclient.desktop"];
+      "text/x-csrc" = ["emacsclient.desktop"];
+      "text/x-shellscript" = ["emacsclient.desktop"];
+      "inode/directory" = ["yazi.desktop"];
+    };
+  };
 
   xdg.configFile."hypr/hyprland.conf".force = true;
   xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
+  xdg.configFile."yazi/yazi.toml".source = ../../dotfiles/yazi/yazi.toml;
+  xdg.configFile."yazi/keymap.toml".source = ../../dotfiles/yazi/keymap.toml;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
   xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
   xdg.configFile."fcitx5/conf/classicui.conf" = {

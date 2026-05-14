@@ -60,7 +60,7 @@ The schema as list below:
 | Launcher       | wofi                          |
 | Status Bar     | waybar                        |
 | Terminal       | ghostty                      |
-| File Manager   | nemo*                         |
+| File Manager   | yazi                          |
 | Notifications  | dunst/libnotify               |
 | GTK            | juno-theme                    |
 | Icon           | beauty-line-icon              |
@@ -453,7 +453,7 @@ All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hy
 | =Super + R=             | Enter resize mode (arrows / HJKL)|
 | =Super + T=             | Open terminal (=ghostty=)        |
 | =Super + X=             | Open launcher (=wofi=)           |
-| =Super + E=             | Open file manager (=nemo=)       |
+| =Super + E=             | Open file manager (=yazi=)       |
 | =Super + L=             | Lock screen (=swaylock=)         |
 | =Super + Q=             | Quit Hyprland                    |
 | =Super + Alt + arrows=  | Move window                      |
