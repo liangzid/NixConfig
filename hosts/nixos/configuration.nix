@@ -46,6 +46,19 @@
 
   services.udisks2.enable = true;
 
+  services.printing.enable = true;
+  services.printing.drivers = with pkgs; [
+    gutenprint
+    hplip
+    brlaser
+  ];
+
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
   users.users.zi = {
     isNormalUser = true;
     description = "zi";
@@ -109,6 +122,7 @@
     vista-fonts
     clash-verge-rev
     udiskie
+    system-config-printer
   ];
 
   programs.nm-applet.enable = true;
