@@ -104,7 +104,7 @@
     wezterm
     zellij
 
-    hermes-agent.packages.${pkgs.system}.default
+    hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   home.shellAliases = {
@@ -146,7 +146,16 @@
 
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
     matchBlocks = {
+      "*" = {
+        extraOptions = {
+          ServerAliveInterval = "15";
+          ServerAliveCountMax = "8";
+          TCPKeepAlive = "yes";
+          AddKeysToAgent = "yes";
+        };
+      };
       "is1" = {
         hostname = "is1.astaple.com";
         user = "zi";
@@ -237,13 +246,6 @@
         user = "ronghua";
       };
     };
-
-    extraConfig = ''
-      ServerAliveInterval 15
-      ServerAliveCountMax 8
-      TCPKeepAlive yes
-      AddKeysToAgent yes
-    '';
   };
 
   xdg.mimeApps = {

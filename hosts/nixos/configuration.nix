@@ -44,6 +44,8 @@
   security.polkit.enable = true;
   security.pam.services.swaylock = {};
 
+  services.udisks2.enable = true;
+
   users.users.zi = {
     isNormalUser = true;
     description = "zi";
@@ -106,6 +108,7 @@
     corefonts
     vista-fonts
     clash-verge-rev
+    udiskie
   ];
 
   programs.nm-applet.enable = true;
@@ -116,7 +119,7 @@
     dedicatedServer.openFirewall = true;
   };
   hardware.steam-hardware.enable = true;
-  hardware.opengl.enable = true;
+  hardware.graphics.enable = true;
 
   environment.sessionVariables.TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";
 
