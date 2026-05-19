@@ -10,6 +10,11 @@ max_width = 1000
 max_height = 600
 cache_dir = ""
 
+[plugin]
+prepend_previewers = [
+  { name = "*.pdf", run = "pdftoppm -png -f 1 -l 2 -scale-to 1000 -singlefile \"$1\"", sync = true, orphan = true },
+]
+
 [opener]
 open = [
 	{ run = 'xdg-open "$0"', desc = "Open with default" },

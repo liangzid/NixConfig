@@ -34,6 +34,7 @@
 
     wl-clipboard
     w3m
+    poppler-utils
     aspell
     scrot
     jdk17
