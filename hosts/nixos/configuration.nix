@@ -18,6 +18,7 @@
 
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.supportedFilesystems = [ "ntfs" ];
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
@@ -45,6 +46,7 @@
   security.pam.services.swaylock = {};
 
   services.udisks2.enable = true;
+  services.gvfs.enable = true;
 
   services.printing.enable = true;
   services.printing.drivers = with pkgs; [
@@ -123,9 +125,16 @@
     clash-verge-rev
     udiskie
     system-config-printer
+
+    nautilus
+    nautilus-python
+    gnome-disk-utility
+    loupe
+    adwaita-icon-theme
   ];
 
   programs.nm-applet.enable = true;
+  programs.dconf.enable = true;
 
   programs.steam = {
     enable = true;
@@ -135,7 +144,10 @@
   hardware.steam-hardware.enable = true;
   hardware.graphics.enable = true;
 
-  environment.sessionVariables.TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";
+  environment.sessionVariables = {
+    GDK_BACKEND = "wayland";
+    TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";
+  };
 
   system.stateVersion = "26.05";
 }

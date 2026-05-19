@@ -14,7 +14,6 @@
   home.packages = with pkgs; [
     wofi
     waybar
-    yazi
     dunst
     libnotify
 
@@ -48,8 +47,6 @@
     uv
 
     gh
-    yazi
-    
 
     pkg-config
     glib
@@ -268,7 +265,7 @@
       "text/x-python" = ["emacsclient.desktop"];
       "text/x-csrc" = ["emacsclient.desktop"];
       "text/x-shellscript" = ["emacsclient.desktop"];
-      "inode/directory" = ["yazi.desktop"];
+      "inode/directory" = ["org.gnome.Nautilus.desktop"];
     };
   };
 
@@ -277,8 +274,6 @@
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
-  xdg.configFile."yazi/yazi.toml".source = ../../dotfiles/yazi/yazi.toml;
-  xdg.configFile."yazi/keymap.toml".source = ../../dotfiles/yazi/keymap.toml;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
   xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
   xdg.configFile."fcitx5/conf/classicui.conf" = {
