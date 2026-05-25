@@ -341,6 +341,12 @@ Use the =update= alias (defined in [[./hosts/nixos/configuration.nix][configurat
 #+begin_src bash
   update
 #+end_src
+
+For a *full system upgrade* (update flake inputs + rebuild), use =upgrade=:
+#+begin_src bash
+  upgrade
+#+end_src
+
 Remember to =git add= any newly created files before rebuilding, as the flake
 requires all referenced files to be Git-tracked.
 
@@ -539,6 +545,7 @@ Defined in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 | =enw=       | =emacs -nw=                                      |
 | =ec=        | =emacsclient=                                    |
 | =update=    | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
+| =upgrade=   | =~/code/NixConfig/upgrade= (flake update + switch)        |
 | =latexmain= | =latexmk --pdflatex main.tex=                    |
 | =gui=       | =start-hyprland=                                 |
 

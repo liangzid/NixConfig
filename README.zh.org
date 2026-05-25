@@ -318,6 +318,11 @@ nix-config/
 #+begin_src bash
   update
 #+end_src
+要进行*完整系统升级*（更新 flake inputs + 重建），使用 =upgrade=：
+#+begin_src bash
+  upgrade
+#+end_src
+
 记住在重建前 =git add= 所有新文件，因为 flake 要求所有引用的文件被 Git 追踪。
 
 * 常见错误与排查
@@ -508,6 +513,7 @@ Fcitx5 配置包括：
 | =enw=      | =emacs -nw=                                       |
 | =ec=       | =emacsclient=                                     |
 | =update=   | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
+| =upgrade=  | =~/code/NixConfig/upgrade= (flake update + switch)        |
 | =latexmain= | =latexmk --pdflatex main.tex=                    |
 | =gui=      | =start-hyprland=                                  |
 
