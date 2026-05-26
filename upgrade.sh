@@ -2,4 +2,4 @@
 set -e
 cd ~/code/NixConfig
 nix --extra-experimental-features 'nix-command flakes' flake update
-echo 'Q3933.com' | sudo -S nixos-rebuild switch --flake .
+sudo nixos-rebuild switch --flake .
