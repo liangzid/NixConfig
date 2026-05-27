@@ -1,3 +1,4 @@
 result
 .homemanager*
 *.qcow2
+/records/
