@@ -525,7 +525,7 @@ Fcitx5 配置包括：
 | =enw=      | =emacs -nw=                                       |
 | =ec=       | =emacsclient=                                     |
 | =update=   | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
-| =upgrade=  | =~/code/NixConfig/upgrade.sh= (flake update + switch)    |
+| =upgrade=  | =cd ~/code/NixConfig && nix flake update && sudo nixos-rebuild switch= |
 | =latexmain= | =latexmk --pdflatex main.tex=                    |
 | =gui=      | =start-hyprland=                                  |
 

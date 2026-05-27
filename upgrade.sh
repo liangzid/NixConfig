@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -e
-cd ~/code/NixConfig
-nix --extra-experimental-features 'nix-command flakes' flake update
-sudo nixos-rebuild switch --flake .
