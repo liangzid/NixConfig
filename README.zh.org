@@ -58,7 +58,7 @@ Nix/NixOS 的核心理念：
 | 截图      | grim/slurp/swappy                  |
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
-| Agent     | opencode                           |
+| Agent     | opencode, pi-coding-agent          |
 | VPN/代理  | clash-verge-rev                    |
 |-----------+------------------------------------|
 
@@ -69,6 +69,18 @@ Nix/NixOS 的核心理念：
 + 输入法：=fcitx5= + =rime= + =pinyin=，主题：=Material-Color-deepPurple=
 + 通讯：=wechat-uos=、=qq=
 + VPN：=clash-verge-rev=
+
+** Coding Agents
+
+安装了两个编码助手：
++ =opencode= — 来自 nixpkgs
++ =pi-coding-agent= (=pi=) — 来自 nixpkgs (=nixos-unstable=)
+
+Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) 的更新通过 NixOS flake 更新周期完成（=upgrade= 别名），
+而非 =pi update=。环境变量 =PI_OFFLINE=1= 在 [[./hosts/nixos/home.nix][home.nix]] 中设置，
+用于禁用启动时的更新可用提示（Nix 管理的二进制文件无法自行更新）。
+
+升级 pi：运行 =upgrade=（执行 =nix flake update= 然后 =nixos-rebuild switch=）。
 
 ** Emacs
 
@@ -513,7 +525,7 @@ Fcitx5 配置包括：
 | =enw=      | =emacs -nw=                                       |
 | =ec=       | =emacsclient=                                     |
 | =update=   | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
-| =upgrade=  | =~/code/NixConfig/upgrade= (flake update + switch)        |
+| =upgrade=  | =~/code/NixConfig/upgrade.sh= (flake update + switch)    |
 | =latexmain= | =latexmk --pdflatex main.tex=                    |
 | =gui=      | =start-hyprland=                                  |
 
@@ -540,6 +552,13 @@ Steam 在系统级别启用：=programs.steam.enable = true=。
 Ghostty 的 terminfo 通过 =environment.sessionVariables.TERMINFO_DIRS=
 提供。此外，Ghostty 配置中 =term = xterm-256color= 保证 SSH 到远程服务器
 （没有 Ghostty terminfo 条目）时的完全兼容性。
+
+** pi-coding-agent (PI_OFFLINE)
+
+Pi 通过 nixpkgs 作为系统软件包安装。环境变量 =PI_OFFLINE=1= 在
+[[./hosts/nixos/home.nix][home.nix]] 中设置，防止 agent 在启动时检查更新 —
+Nix 管理的包位于只读的 =/nix/store= 中，无法自行更新。
+通过正常的 flake 周期更新 pi：=upgrade=。
 
 ** 非自由软件包
 

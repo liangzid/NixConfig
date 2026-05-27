@@ -110,6 +110,8 @@
     duf
     ncdu
     opencode
+    pi-coding-agent
+    nodejs
     firefox
     git
     tmux

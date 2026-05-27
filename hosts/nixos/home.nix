@@ -117,6 +117,9 @@
     GLFW_IM_MODULE = "ibus";
     INPUT_METHOD = "fcitx";
 
+    # pi-coding-agent (Nix-managed, disable self-update checks)
+    PI_OFFLINE = "1";
+
     # For Nvidia
     LIBVA_DRIVER_NAME = "nvidia";
     XDG_SESSION_TYPE = "wayland";

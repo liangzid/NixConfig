@@ -67,7 +67,7 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agent          | opencode                      |
+| Agent          | opencode, pi-coding-agent     |
 | VPN/Proxy      | clash-verge-rev               |
 |----------------+-------------------------------|
 
@@ -79,6 +79,19 @@ Note: This list will keep increase and changed dynamically.
 + Communication: =wechat-uos=, =qq=
 + VPN: =clash-verge-rev=
   
+
+** Coding Agents
+
+Two coding agents are installed:
++ =opencode= — from nixpkgs
++ =pi-coding-agent= (=pi=) — from nixpkgs (=nixos-unstable=)
+
+Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) is updated via the NixOS flake update cycle (=upgrade= alias),
+not through =pi update=. The environment variable =PI_OFFLINE=1= is set in
+[[./hosts/nixos/home.nix][home.nix]] to suppress the startup update-available notification, since
+Nix-managed binaries cannot self-update.
+
+To upgrade pi: =upgrade= (which runs =nix flake update= then =nixos-rebuild switch=).
 
 ** Emacs
 
@@ -545,7 +558,7 @@ Defined in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 | =enw=       | =emacs -nw=                                      |
 | =ec=        | =emacsclient=                                    |
 | =update=    | =sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos= |
-| =upgrade=   | =~/code/NixConfig/upgrade= (flake update + switch)        |
+| =upgrade=   | =~/code/NixConfig/upgrade.sh= (flake update + switch)    |
 | =latexmain= | =latexmk --pdflatex main.tex=                    |
 | =gui=       | =start-hyprland=                                 |
 
@@ -574,6 +587,13 @@ Ghostty's terminfo is made available via
 =environment.sessionVariables.TERMINFO_DIRS=. Additionally, =term = xterm-256color=
 in the Ghostty config ensures full compatibility when SSH-ing to remote
 servers that lack the Ghostty terminfo entry.
+
+** pi-coding-agent (PI_OFFLINE)
+
+Pi is installed via nixpkgs as a system package. The env var =PI_OFFLINE=1=
+is set in [[./hosts/nixos/home.nix][home.nix]] to prevent the agent from checking for updates at
+startup — Nix-managed packages reside in the read-only =/nix/store= and
+cannot self-update. Update pi through the normal flake cycle: =upgrade=.
 
 ** Unfree Packages
 
