@@ -3,6 +3,10 @@
 #+author: Zi Liang
 #+email: zi1415926.liang@connect.polyu.hk
 
+#+begin_center
+[[./README.org][English]] | [[./README.zh.org][中文]]
+#+end_center
+
 [[file:./images/screenshot_20260509_125220.png]]
 
 [[file:./images/screenshot_20260509_125139.png]]
@@ -15,7 +19,11 @@
 
 这篇文档既是个人笔记，也是本仓库的 README。
 
-（英文原版请见 [[./README.org][README.org]]。）
+[[https://img.shields.io/badge/NixOS-26.05-5277C3?style=flat-square&logo=nixos&logoColor=white]]
+[[https://img.shields.io/badge/Hyprland-latest-58e1ff?style=flat-square&logo=hyprland&logoColor=white]]
+[[https://img.shields.io/badge/Wayland-ready-ff9900?style=flat-square&logo=wayland&logoColor=white]]
+
+---
 
 * 什么是 NixOS？
 
@@ -63,6 +71,16 @@ Nix/NixOS 的核心理念：
 |-----------+------------------------------------|
 
 注：此列表会持续更新。
+
+** Highlights
+
++ *完全声明式* — 所有软件包、服务与 dotfile 均由 Nix 描述，任意机器皆可复现。
++ *轻量高效* — 默认为 TTY，按需启动 Hyprland。无冗余。
++ *Flake 驱动* — 锁定依赖版本，原子化升级，内建回滚。
++ *开箱即用的开发环境* — Emacs、Ghostty、Zellij、编程助手 (=opencode=、=pi=)、SSH 跳板机。
++ *Wayland 原生* — 无需 X11 兼容层。截图、流畅动画。
++ *中文友好* — fcitx5 + rime，WeChat、QQ、WPS Office、CJK 字体。
++ *游戏支持* — Steam 含 32 位库，NVIDIA 驱动。
 
 ** 中文输入与通讯
 
