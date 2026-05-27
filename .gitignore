@@ -1,4 +1,5 @@
 result
 .homemanager*
 *.qcow2
+*undo-tree*
 /records/
