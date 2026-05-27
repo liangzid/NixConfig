@@ -5,6 +5,10 @@
 #+latex_class: elegantpaper
 #+filetags: ::
 
+#+begin_center
+[[./README.org][English]] | [[./README.zh.org][中文]]
+#+end_center
+
 [[file:./images/screenshot_20260509_125220.png]]
 
 [[file:./images/screenshot_20260509_125139.png]]
@@ -13,11 +17,15 @@
 
 [[file:./images/screenshot_20260509_125943.png]]
 
-I spent -two- three days to move my previous linux configuration and development environments into NixOS.
+I spent three days to move my previous linux configuration and development environments into NixOS.
 
 This document is the note of it, also performing as the README file.
 
-（中文版请见 [[./README.zh.org][README.zh.org]]。）
+[[https://img.shields.io/badge/NixOS-26.05-5277C3?style=flat-square&logo=nixos&logoColor=white]]
+[[https://img.shields.io/badge/Hyprland-latest-58e1ff?style=flat-square&logo=hyprland&logoColor=white]]
+[[https://img.shields.io/badge/Wayland-ready-ff9900?style=flat-square&logo=wayland&logoColor=white]]
+
+---
 
 * What is NixOS?
 
@@ -72,6 +80,16 @@ The schema as list below:
 |----------------+-------------------------------|
 
 Note: This list will keep increase and changed dynamically.
+
+** Highlights
+
++ *Fully Declarative* — every package, service, and dotfile is described in Nix, reproducible on any machine.
++ *Minimal & Fast* — TTY by default, Hyprland on demand. No bloat.
++ *Flake-Powered* — pinned dependencies, atomic upgrades, rollbacks built-in.
++ *Developer-Ready* — Emacs, Ghostty, Zellij, coding agents (=opencode=, =pi=), SSH with jump hosts.
++ *Wayland Native* — no X11 legacy. Screenshots, smooth animations.
++ *Chinese-Friendly* — fcitx5 + rime, WeChat, QQ, WPS Office, CJK fonts.
++ *Gaming Support* — Steam with 32-bit libs, NVIDIA drivers.
 
 ** Chinese Input & Communication
 
