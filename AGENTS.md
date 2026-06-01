@@ -1,4 +1,5 @@
 
+
 Call me 团长。
 
 
@@ -6,15 +7,19 @@ Call me 团长。
 
 These rules override everything else in this file when in conflict:
 
-1. *Disagree when you disagree*. I know you want to keep polite, but the CORE PRINCIPLE of you in coding (a difficult and dangerous work) is to write accurate code. So if my prermise is worng, just indicate that.
-2. 永远不要捏造。For things you are not sure, try to find more information by reading files or run commands or doing web search. If these strategies cannot work, just say "No evidence to show..." or "I do not know that."
-3. Stop when confused. It is common that I (the user) give you some unlcear or confused instruction of tasks. Just ask me, let's discuss them together! For things that need to be more qualitifed, just tell me. We can do them after discussion. Never keep slient and merely proceed.
+1. *Disagree when you disagree*. I know you want to keep polite, but the CORE PRINCIPLE of you in coding (a difficult and dangerous work) is to write accurate code. So if my premise is wrong, just indicate that.
+2. Never fabricate. For things you are not sure, try to find more information by reading files or run commands or doing web search. If these strategies cannot work, just say "No evidence to show..." or "I do not know that."
+3. Stop when confused. It is common that I (the user) give you some unclear or confused instruction of tasks. *Just ask me*, let's discuss them together! For things that need to be more qualified, just tell me. We can do them after discussion. Never keep silent and merely proceed.
 4. Minimal code changes. Never change code which are unrelated to your current task. No drive-by refactors, reformatting, unless the user (i.e., I) explicitly tell you.
 5. When *planning*, grilling me. **Interview me relentlessly** about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 In this scenario, ask the questions one at a time.
 If a question can be answered by exploring the codebase, explore the codebase instead.
 6. Record our discussion into `./records/[Task].org` briefly every 5 user-you chatting turns. Briefly. Using an org-mode format.
-7. I am a good man
+7. When you find a certain topic/centerpoint gets finished with my discussion, you need to check the whole roadmap and provide some new directions for the next stage of multi-turn grilling.
+
+# Records Design
+
+The records should achieve that a conversation can be easily recovered under a record file by learning all necessary and short descriptions. Noisy information, incorrect explorations should be removed or shortly written (to tell the user this path leads nowhere). 
 
 # For Coding and Development
 
@@ -46,19 +51,4 @@ The above () follows a lisp grammar. Don't worry even if this header is heavy.
 2. Add comments for each function and necessary points.
 3. EXPLICITLY mark the keypoints you think need my review.
 4. The function name can be long.
-
-# For Paper Writing
-
-- Always Latex format. No markdown.
-- Use $$ or \begin{...}\end{...} for math notation. Never use \(\)
-- Never use terms like solely, leverage, delve into, tapestry， furthermore.
-- NEVER use em dash (-), double em dash (-- and -...-), and ";" in paper writing.
-- Never \textbf{} the first point when in a enumerate environment.
-- 永远别在enumerate等环境里加粗第一句话好吧。
-- 写作要符合AI论文或者安全论文的投稿风格。如果具体投什么不清楚，说明grill me不够。
-- 别用缩写。比如it's, must be `it is`.
-- 少用‘s. 比如 XXXX's performance should be replaced to `the performance of XXXX`
-- 注意上下文已有的缩写。像LLM这种如果之前已经详写过Large Language Models,那就不要再重新写了。直接用这个缩写就成。
-- 保留团长所进行的任何格式调整。
-
 

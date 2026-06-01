@@ -12,9 +12,13 @@
       url = "github:NousResearch/hermes-agent";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    codewhale = {
+      url = "github:Hmbown/CodeWhale";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, hermes-agent, ... }: {
+  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, hermes-agent, codewhale, ... }: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
@@ -30,7 +34,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.zi = import ./hosts/nixos/home.nix;
-          home-manager.extraSpecialArgs = { inherit hyprland hermes-agent; };
+          home-manager.extraSpecialArgs = { inherit hyprland hermes-agent codewhale; };
         }
       ];
     };

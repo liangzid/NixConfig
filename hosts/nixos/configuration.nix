@@ -90,7 +90,7 @@
   environment.shellAliases = {
     enw = "emacs -nw";
     update = "sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos";
-    upgrade = "cd ~/code/NixConfig && nix flake update && sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos";
+    upgrade = "cd ~/code/NixConfig && nix --extra-experimental-features 'nix-command flakes' flake update && sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos";
     latexmain = "latexmk --pdflatex main.tex";
     gui = "start-hyprland";
     ec = "emacsclient";

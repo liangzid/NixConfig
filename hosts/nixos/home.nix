@@ -1,4 +1,4 @@
-{ config, pkgs, hermes-agent, ... }:
+{ config, pkgs, hermes-agent, codewhale, ... }:
 
 {
   imports = [
@@ -103,6 +103,7 @@
     zellij
 
     hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
+    codewhale.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   home.shellAliases = {
