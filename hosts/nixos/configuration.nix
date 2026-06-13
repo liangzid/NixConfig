@@ -115,6 +115,7 @@
     ncdu
     opencode
     pi-coding-agent
+    reasonix
     nodejs
     firefox
     git

@@ -14,13 +14,27 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, codewhale, ... }: {
+  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, codewhale, ... }: let
+    system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
+      reasonix = final.callPackage ./modules/packages/reasonix.nix { };
+    });
+  in {
+    packages.${system} = {
+      inherit (pkgs) reasonix;
+    };
+
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      inherit system;
       modules = [
 
         {
-          nixpkgs.overlays = [ emacs-overlay.overlays.default ];
+          nixpkgs.overlays = [
+            emacs-overlay.overlays.default
+            (final: prev: {
+              reasonix = final.callPackage ./modules/packages/reasonix.nix { };
+            })
+          ];
         }
 
         hyprland.nixosModules.default
