@@ -68,6 +68,10 @@
     packages = with pkgs; [];
   };
 
+  nix.settings.max-jobs = 2;
+  nix.settings.cores = 2;
+  nix.settings.http2 = false;
+
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (pkg.pname or "") [
     "nvidia-x11"

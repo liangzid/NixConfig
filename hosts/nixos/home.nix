@@ -1,4 +1,4 @@
-{ config, pkgs, hermes-agent, codewhale, ... }:
+{ config, pkgs, codewhale, ... }:
 
 {
   imports = [
@@ -43,7 +43,7 @@
     socat
     cmake
     ripgrep
-    silver-searcher
+
     uv
 
     gh
@@ -102,7 +102,6 @@
     wezterm
     zellij
 
-    hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
     codewhale.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
@@ -131,11 +130,13 @@
   home.file."Pictures/Wallpapers" = {
     source = ../../dotfiles/wallpapers;
     recursive = true;
+    force = true;
   };
 
   home.file."scripts/wallpaper-picker.sh" = {
     source = ../../dotfiles/scripts/wallpaper-picker.sh;
     executable = true;
+    force = true;
   };
 
   home.file."${config.xdg.dataHome}/fonts/wps-fonts" = {
@@ -275,7 +276,9 @@
 
   xdg.configFile."hypr/hyprland.conf".force = true;
   xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
+  xdg.configFile."wofi/config".force = true;
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
+  xdg.configFile."wofi/style.css".force = true;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
