@@ -5,6 +5,7 @@
     ../../modules/home/emacs.nix
     ../../modules/home/waybar.nix
     ../../modules/home/gtk.nix
+    ../../modules/home/common-lisp.nix
   ];
 
   home.username = "zi";
