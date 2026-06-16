@@ -74,6 +74,7 @@
     # pdf
     kdePackages.okular
     zathuraPkgs.zathuraWrapper
+    mupdf
 
     # Develop (Just for back up)
     vscode-fhs
