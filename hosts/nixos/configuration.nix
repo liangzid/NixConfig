@@ -64,8 +64,15 @@
   users.users.zi = {
     isNormalUser = true;
     description = "zi";
-    extraGroups = [ "networkmanager" "wheel" "video" "render" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "render" "docker" ];
     packages = with pkgs; [];
+  };
+
+  # Docker service
+  virtualisation.docker.enable = true;
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
   };
 
   nix.settings.max-jobs = 2;
@@ -122,6 +129,9 @@
     tmux
     fastfetch
     htop
+    postgresql_17
+    docker-compose
+    openssl
 
 
     wechat-uos
