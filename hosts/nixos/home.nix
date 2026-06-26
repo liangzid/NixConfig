@@ -60,6 +60,7 @@
     freeglut
     enchant
     gcc
+    gnumake
 
     zip
     unzip
@@ -151,7 +152,7 @@
 
   programs.ssh = {
     enable = true;
-    enableDefaultConfig = false;
+    enableDefaultConfig = true;
     matchBlocks = {
       "*" = {
         extraOptions = {
@@ -159,6 +160,7 @@
           ServerAliveCountMax = "8";
           TCPKeepAlive = "yes";
           AddKeysToAgent = "yes";
+          StrictModes = "no";
         };
       };
       "is1" = {
