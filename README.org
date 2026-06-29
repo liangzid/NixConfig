@@ -75,7 +75,7 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agent          | opencode, pi-coding-agent     |
+| Agents         | pi-coding-agent, llm-agents (claw-code, code, codex, crush, omp, opencode, reasonix, hermes-desktop, agent-browser) |
 | VPN/Proxy      | clash-verge-rev               |
 |----------------+-------------------------------|
 
@@ -86,7 +86,7 @@ Note: This list will keep increase and changed dynamically.
 + *Fully Declarative* — every package, service, and dotfile is described in Nix, reproducible on any machine.
 + *Minimal & Fast* — TTY by default, Hyprland on demand. No bloat.
 + *Flake-Powered* — pinned dependencies, atomic upgrades, rollbacks built-in.
-+ *Developer-Ready* — Emacs, Ghostty, Zellij, coding agents (=opencode=, =pi=), SSH with jump hosts.
+ *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =omp=, =hermes-desktop=, =agent-browser=), SSH with jump hosts.
 + *Wayland Native* — no X11 legacy. Screenshots, smooth animations.
 + *Chinese-Friendly* — fcitx5 + rime, WeChat, QQ, WPS Office, CJK fonts.
 + *Gaming Support* — Steam with 32-bit libs, NVIDIA drivers.
@@ -100,16 +100,29 @@ Note: This list will keep increase and changed dynamically.
 
 ** Coding Agents
 
-Two coding agents are installed:
-+ =opencode= — from nixpkgs
-+ =pi-coding-agent= (=pi=) — from nixpkgs (=nixos-unstable=)
+Coding agents are sourced from [[https://github.com/numtide/llm-agents.nix][numtide/llm-agents.nix]], with
+=pi-coding-agent= pulled directly from nixpkgs. The following agents are
+declared in [[./hosts/nixos/configuration.nix][configuration.nix]]:
+
++ =pi-coding-agent= (=pi=) — nixpkgs (=nixos-unstable=); pinned by flake update
++ =llm-agents.opencode= — terminal coding agent
++ =llm-agents.codex= — OpenAI Codex CLI
++ =llm-agents.reasonix= — reasoning-focused agent
++ =llm-agents.crush= — interactive coding agent
++ =llm-agents.claw-code= — Anthropic Claude Code-style agent
++ =llm-agents.code= — generic coding agent
++ =llm-agents.omp= — Oh My Pi coding agent
++ =llm-agents.hermes-desktop= — desktop UI agent
++ =llm-agents.agent-browser= — browser-driven agent
 
 Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) is updated via the NixOS flake update cycle (=upgrade= alias),
 not through =pi update=. The environment variable =PI_OFFLINE=1= is set in
 [[./hosts/nixos/home.nix][home.nix]] to suppress the startup update-available notification, since
 Nix-managed binaries cannot self-update.
 
-To upgrade pi: =upgrade= (which runs =nix flake update= then =nixos-rebuild switch=).
+To upgrade any agent: =upgrade= (which runs =nix flake update= then
+=nixos-rebuild switch=). The =llm-agents= input is a flake input, so all of its
+packages move together on every =nix flake update=.
 
 ** Emacs
 
