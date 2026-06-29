@@ -1,4 +1,4 @@
-{ config, pkgs, codewhale, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
@@ -104,8 +104,6 @@
     ghostty
     wezterm
     zellij
-
-    codewhale.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   home.shellAliases = {

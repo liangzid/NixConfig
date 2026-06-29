@@ -8,22 +8,13 @@
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
     eamcs-overlay.url = "github:nix-community/emacs-overlay";
-    codewhale = {
-      url = "github:Hmbown/CodeWhale";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, codewhale, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, llm-agents, ... }: let
     system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
-      reasonix = final.callPackage ./modules/packages/reasonix.nix { };
-    });
+    pkgs = nixpkgs.legacyPackages.${system};
   in {
-    packages.${system} = {
-      inherit (pkgs) reasonix;
-    };
-
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       inherit system;
       modules = [
@@ -31,9 +22,7 @@
         {
           nixpkgs.overlays = [
             emacs-overlay.overlays.default
-            (final: prev: {
-              reasonix = final.callPackage ./modules/packages/reasonix.nix { };
-            })
+            llm-agents.overlays.default
           ];
         }
 
@@ -44,7 +33,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.zi = import ./hosts/nixos/home.nix;
-          home-manager.extraSpecialArgs = { inherit hyprland codewhale; };
+          home-manager.extraSpecialArgs = { inherit hyprland; };
         }
       ];
     };

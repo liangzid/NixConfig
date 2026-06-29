@@ -75,9 +75,15 @@
     setSocketVariable = true;
   };
 
-  nix.settings.max-jobs = 2;
-  nix.settings.cores = 2;
-  nix.settings.http2 = false;
+  nix.settings = {
+    max-jobs = 2;
+    cores = 2;
+    http2 = false;
+    extra-substituters = [ "https://cache.numtide.com" ];
+    extra-trusted-public-keys = [
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+    ];
+  };
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (pkg.pname or "") [
@@ -120,9 +126,16 @@
     fzf
     duf
     ncdu
-    opencode
+    llm-agents.claw-code
+    llm-agents.code
+    llm-agents.codex
+    llm-agents.crush
+    llm-agents.omp
+    llm-agents.opencode
+    llm-agents.reasonix
+    llm-agents.hermes-desktop
+    llm-agents.agent-browser
     pi-coding-agent
-    reasonix
     nodejs
     firefox
     git
