@@ -442,8 +442,9 @@ Hyprland 已安装，但默认会话是 TTY。登录后运行：
 ** Wofi / 启动器不显示输入法候选词
 
 确保 =fcitx5= 已在运行（在 [[./dotfiles/hypr/hyprland.conf][hyprland.conf]] 的 Hyprland 自启动中加入
-=fcitx5 -d=）。环境变量 =GTK_IM_MODULE=fcitx= 等已在 =home.nix= 中配置，
-但部分应用需要 =fcitx5= 先启动。
+=fcitx5 -d=）。在 Wayland 下 =GTK_IM_MODULE= 在 =home.nix= 中*故意未设置* ——
+fcitx5 的 Wayland 输入法前端会处理 GTK 应用
+（见 [[./hosts/nixos/home.nix][home.nix]]）。部分应用需要 =fcitx5= 先启动。
 
 ** WeChat / QQ 字体乱码或缺失
 
