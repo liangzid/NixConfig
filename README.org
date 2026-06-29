@@ -474,8 +474,9 @@ with this config (the alias is set in =configuration.nix=).
 ** Wofi / launcher not showing input method candidates
 
 Ensure you started =fcitx5= (add =fcitx5 -d= to your Hyprland autostart in
-[[./dotfiles/hypr/hyprland.conf][hyprland.conf]]). The environment variables =GTK_IM_MODULE=fcitx= etc. are
-set in =home.nix= but some applications need =fcitx5= running first.
+[[./dotfiles/hypr/hyprland.conf][hyprland.conf]]). On Wayland, =GTK_IM_MODULE= is intentionally *unset*
+in =home.nix= — fcitx5's Wayland input method frontend handles GTK apps
+(see [[./hosts/nixos/home.nix][home.nix]]). Some applications need =fcitx5= running first.
 
 ** WeChat / QQ fonts garbled or missing
 
