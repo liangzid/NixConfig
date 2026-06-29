@@ -111,7 +111,10 @@
   };
 
   home.sessionVariables = {
-    GTK_IM_MODULE = "fcitx";
+    # GTK_IM_MODULE intentionally unset on Wayland — fcitx5's Wayland input
+    # method frontend (via fcitx5-gtk / xdg-desktop-portal) handles GTK apps.
+    # Setting it to "fcitx" forces the legacy XIM path and triggers fcitx5's
+    # diagnostic warning. See https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
