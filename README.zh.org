@@ -66,7 +66,7 @@ Nix/NixOS 的核心理念：
 | 截图      | grim/slurp/swappy                  |
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
-| Agent     | opencode, pi-coding-agent          |
+| Agent     | pi-coding-agent, llm-agents（claw-code、code、codex、crush、omp、opencode、reasonix、hermes-desktop、agent-browser） |
 | VPN/代理  | clash-verge-rev                    |
 |-----------+------------------------------------|
 
@@ -77,7 +77,7 @@ Nix/NixOS 的核心理念：
 + *完全声明式* — 所有软件包、服务与 dotfile 均由 Nix 描述，任意机器皆可复现。
 + *轻量高效* — 默认为 TTY，按需启动 Hyprland。无冗余。
 + *Flake 驱动* — 锁定依赖版本，原子化升级，内建回滚。
-+ *开箱即用的开发环境* — Emacs、Ghostty、Zellij、编程助手 (=opencode=、=pi=)、SSH 跳板机。
+*开箱即用的开发环境* — Emacs、Ghostty、Zellij、一套精选的 LLM 编程助手 (=pi=、=opencode=、=codex=、=reasonix=、=crush=、=claw-code=、=code=、=omp=、=hermes-desktop=、=agent-browser=)、SSH 跳板机。
 + *Wayland 原生* — 无需 X11 兼容层。截图、流畅动画。
 + *中文友好* — fcitx5 + rime，WeChat、QQ、WPS Office、CJK 字体。
 + *游戏支持* — Steam 含 32 位库，NVIDIA 驱动。
@@ -90,16 +90,28 @@ Nix/NixOS 的核心理念：
 
 ** Coding Agents
 
-安装了两个编码助手：
-+ =opencode= — 来自 nixpkgs
-+ =pi-coding-agent= (=pi=) — 来自 nixpkgs (=nixos-unstable=)
+编码助手来自 [[https://github.com/numtide/llm-agents.nix][numtide/llm-agents.nix]]，
+=pi-coding-agent= 直接来自 nixpkgs。下列 Agent 在
+[[./hosts/nixos/configuration.nix][configuration.nix]] 中声明：
+
++ =pi-coding-agent= (=pi=) — 来自 nixpkgs (=nixos-unstable=)；随 flake 更新锁定版本
++ =llm-agents.opencode= — 终端编程助手
++ =llm-agents.codex= — OpenAI Codex CLI
++ =llm-agents.reasonix= — 偏推理的编程助手
++ =llm-agents.crush= — 交互式编程助手
++ =llm-agents.claw-code= — Claude Code 风格的代理
++ =llm-agents.code= — 通用编程助手
++ =llm-agents.omp= — Oh My Pi 编程助手
++ =llm-agents.hermes-desktop= — 桌面 UI 助手
++ =llm-agents.agent-browser= — 浏览器驱动的代理
 
 Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) 的更新通过 NixOS flake 更新周期完成（=upgrade= 别名），
 而非 =pi update=。环境变量 =PI_OFFLINE=1= 在 [[./hosts/nixos/home.nix][home.nix]] 中设置，
 用于禁用启动时的更新可用提示（Nix 管理的二进制文件无法自行更新）。
 
-升级 pi：运行 =upgrade=（执行 =nix flake update= 然后 =nixos-rebuild switch=）。
-
+升级任意 agent：运行 =upgrade=（执行 =nix flake update= 然后
+=nixos-rebuild switch=）。=llm-agents= 是一个 flake 输入，因此它提供的所有
+package 会随每次 =nix flake update= 一起更新。
 ** Emacs
 
 Emacs 从 [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] 拉取，提供最新的 =emacs-unstable-pgtk= 构建，原生支持 Wayland。
