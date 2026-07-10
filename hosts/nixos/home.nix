@@ -90,6 +90,7 @@
     # Gaming
     steam-run
 
+    drawio
 
     # Locking Screen and Laptop-Related
     swaylock-effects
