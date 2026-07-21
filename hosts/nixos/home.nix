@@ -91,6 +91,8 @@
     steam-run
 
     drawio
+    libreoffice
+    xournalpp
 
     # Locking Screen and Laptop-Related
     swaylock-effects

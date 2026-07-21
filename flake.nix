@@ -22,7 +22,7 @@
         {
           nixpkgs.overlays = [
             emacs-overlay.overlays.default
-            llm-agents.overlays.default
+            llm-agents.overlays.shared-nixpkgs
           ];
         }
 
