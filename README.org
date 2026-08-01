@@ -72,6 +72,7 @@ The schema as list below:
 | Notifications  | dunst/libnotify               |
 | GTK            | juno-theme                    |
 | Icon           | beauty-line-icon              |
+| Font           | Sarasa UI SC / FiraCode Nerd Font Mono |
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
@@ -157,7 +158,7 @@ nix-config/
 └── dotfiles/                 # Configuration files managed by home-manager
     ├── hypr/hyprland.conf    # Hyprland keybindings + autostart
     ├── wofi/{config,style.css}
-    ├── ghostty/config        # Terminal with Aura theme
+    ├── ghostty/config        # Terminal with Tokyo Night theme
     ├── clash/merge-hk.yaml   # GFW bypass rules (Hong Kong mode)
     ├── clash/merge-cn.yaml   # GFW bypass rules (Mainland mode)
     └── (fcitx5 config now declarative via i18n.inputMethod.fcitx5.settings)
@@ -520,7 +521,7 @@ Ghostty is the primary terminal emulator.  Most custom keybindings are
 commented out — only =Ctrl+Shift+T= (new tab) is active.
 (See [[./dotfiles/ghostty/config][dotfiles/ghostty/config]].)
 
-Ghostty uses the =Aura= theme with =background-opacity = 0.8= and
+Ghostty uses the =tokyo-night= theme with =background-opacity = 0.8= and
 =term = xterm-256color= for full compatibility when SSH-ing to remote servers.
 
 * Laboratory Server Access
