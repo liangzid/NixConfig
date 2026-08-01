@@ -157,7 +157,7 @@ nix-config/
 └── dotfiles/                 # Configuration files managed by home-manager
     ├── hypr/hyprland.conf    # Hyprland keybindings + autostart
     ├── wofi/{config,style.css}
-    ├── ghostty/config        # Terminal with Emacs-style keybinds + Aura theme
+    ├── ghostty/config        # Terminal with Aura theme
     ├── clash/merge-hk.yaml   # GFW bypass rules (Hong Kong mode)
     ├── clash/merge-cn.yaml   # GFW bypass rules (Mainland mode)
     └── fcitx5/{classicui,pinyin}.conf  # Input method theming & behaviour
@@ -514,25 +514,11 @@ All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hy
 | =Ctrl + Print=          | Fullscreen screenshot → clipboard|
 | =Ctrl + Calculator=     | Fullscreen screenshot → clipboard|
 
-* Ghostty Keybindings
+* Ghostty Configuration
 
-Ghostty is the primary terminal emulator, configured with Emacs-style
-keybinding conventions (defined in [[./dotfiles/ghostty/config][dotfiles/ghostty/config]]).
-
-| Key                     | Action                           |
-|-------------------------+----------------------------------|
-| =C-x 2=                 | Split horizontally (down)        |
-| =C-x 3=                 | Split vertically (right)         |
-| =C-x 1=                 | Zoom (maximize) current split    |
-| =C-x 0=                 | Close current split              |
-| =C-x o=                 | Next split (other-window)        |
-| =C-x k=                 | Close current split              |
-| =C-x b=                 | Tab overview                     |
-| =Alt + 1-9=             | Jump to tab 1-9                  |
-| =Ctrl+Shift+T= / =C-t=  | New tab                          |
-| =Ctrl+Shift+W=          | Close surface                    |
-| =Ctrl+Shift+Enter=      | New split (auto direction)       |
-| =Ctrl+Shift+,=           | Reload config                    |
+Ghostty is the primary terminal emulator.  Most custom keybindings are
+commented out — only =Ctrl+Shift+T= (new tab) is active.
+(See [[./dotfiles/ghostty/config][dotfiles/ghostty/config]].)
 
 Ghostty uses the =Aura= theme with =background-opacity = 0.8= and
 =term = xterm-256color= for full compatibility when SSH-ing to remote servers.
