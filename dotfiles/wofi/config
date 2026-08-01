@@ -2,8 +2,6 @@ width=400
 height=300
 location=center
 show=drun
-term=foot
 
 gtk-dark=true
-
 

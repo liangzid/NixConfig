@@ -67,7 +67,9 @@
   users.users.zi = {
     isNormalUser = true;
     description = "zi";
-    extraGroups = [ "networkmanager" "wheel" "video" "render" "docker" ];
+    # 已启用 rootless docker（默认 context 指向 /run/user/1000/docker.sock），
+    # 不再需要 docker 组（该组等价于 root，会绕过 rootless 隔离）。
+    extraGroups = [ "networkmanager" "wheel" "video" "render" ];
     packages = with pkgs; [];
   };
 
@@ -79,8 +81,11 @@
   };
 
   nix.settings = {
-    max-jobs = 2;
-    cores = 2;
+    # i5-13400F（16 线程），放开并行度加速构建；cores=0 表示不限制。
+    max-jobs = 8;
+    cores = 0;
+    # 保留 http2=false：疑似 Clash 代理时代的兼容设置；当前下载一切正常，
+    # 移除有破坏代理下载的风险，收益不明显。确认代理无碍后可删除。
     http2 = false;
     # 让 nix-shell / nix 命令默认可用 flakes 语法（nixos-rebuild 内部自带）。
     experimental-features = [ "nix-command" "flakes" ];
@@ -200,6 +205,10 @@
   };
   hardware.steam-hardware.enable = true;
   hardware.graphics.enable = true;
+
+  # 31G 内存 + 无磁盘 swap：zram 压缩内存作为 swap，防止内存压力下 OOM。
+  # 如需休眠（suspend-to-disk）再另加 swapfile。
+  zramSwap.enable = true;
 
   environment.sessionVariables = {
     GDK_BACKEND = "wayland";
