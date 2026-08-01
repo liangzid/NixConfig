@@ -113,10 +113,10 @@
   };
 
   home.sessionVariables = {
-    # GTK_IM_MODULE intentionally unset on Wayland — fcitx5's Wayland input
-    # method frontend (via fcitx5-gtk / xdg-desktop-portal) handles GTK apps.
-    # Setting it to "fcitx" forces the legacy XIM path and triggers fcitx5's
-    # diagnostic warning. See https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland
+    # 注意：GTK_IM_MODULE 不在这里设置。waylandFrontend=true 后 NixOS
+    # 不再全局设置它：Wayland 原生 GTK 走 text-input-v3，X11/XWayland
+    # GTK 由 gtk-3.0/gtk-4.0 settings.ini 指定 fcitx 模块。
+    # Qt 在非 KDE 合成器下必须显式指定 fcitx（WPS 等依赖）。
     QT_IM_MODULE = "fcitx";
     XMODIFIERS = "@im=fcitx";
     SDL_IM_MODULE = "fcitx";
@@ -341,15 +341,6 @@
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
   xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
-  xdg.configFile."fcitx5/conf/classicui.conf" = {
-    source = ../../dotfiles/fcitx5/classicui.conf;
-    force = true;
-  };
-  xdg.configFile."fcitx5/conf/pinyin.conf" = {
-    source = ../../dotfiles/fcitx5/pinyin.conf;
-    force = true;
-  };
-
   home.activation.cloneEmacs = config.lib.dag.entryAfter ["writeBoundary"] ''
     if [ ! -d "$HOME/.emacs.d/.git" ]; then
       rm -rf "$HOME/.emacs.d"
