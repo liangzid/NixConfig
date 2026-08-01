@@ -197,6 +197,10 @@
 
   programs.nm-applet.enable = true;
   programs.dconf.enable = true;
+  # 禁用 systemd-ssh-proxy 的系统 Include：NixOS 生成的 /etc/ssh/ssh_config
+  # 会 Include systemd 包里的 store 文件（属主 nobody），OpenSSH 10.4 的
+  # 属主检查直接拒绝（Bad owner or permissions），导致所有 ssh 命令失败。
+  programs.ssh.systemd-ssh-proxy.enable = false;
 
   programs.steam = {
     enable = true;

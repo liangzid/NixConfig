@@ -193,6 +193,18 @@
     export DEEPSEEK_API_KEY="$(cat ${config.sops.secrets.DEEPSEEK_API_KEY.path})"
   '';
 
+  # OpenSSH 要求 ~/.ssh/config 属主为 root 或当前用户，而 HM 生成的
+  # store 文件属主是 nobody，会被 ssh 拒绝（Bad owner or permissions）。
+  # 激活后把 config 复制成真实文件（600），保持声明式内容不变。
+  home.activation.sshConfigRealFile = config.lib.dag.entryAfter ["writeBoundary"] ''
+    if [ -L "$HOME/.ssh/config" ]; then
+      storeConfig="$(readlink "$HOME/.ssh/config")"
+      $DRY_RUN_CMD rm "$HOME/.ssh/config"
+      $DRY_RUN_CMD cp "$storeConfig" "$HOME/.ssh/config"
+      $DRY_RUN_CMD chmod 600 "$HOME/.ssh/config"
+    fi
+  '';
+
 
   programs.ssh = {
     enable = true;
@@ -215,7 +227,6 @@
         ControlPath = "~/.ssh/master-%r@%n:%p";
         ControlPersist = "no";
         TCPKeepAlive = "yes";
-        StrictModes = "no";
       };
       is1 = {
         HostName = "is1.astaple.com";
