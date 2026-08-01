@@ -63,6 +63,7 @@ Nix/NixOS 的核心理念：
 | 通知      | dunst/libnotify                    |
 | GTK主题   | juno-theme                         |
 | 图标      | beauty-line-icon                   |
+| 字体      | Sarasa UI SC / FiraCode Nerd Font Mono |
 | 截图      | grim/slurp/swappy                  |
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
@@ -145,7 +146,7 @@ nix-config/
 └── dotfiles/                 # 由 home-manager 管理的配置文件
     ├── hypr/hyprland.conf    # Hyprland 快捷键 + 自启动
     ├── wofi/{config,style.css}
-    ├── ghostty/config        # 终端（Emacs 风格快捷键 + Aura 主题）
+    ├── ghostty/config        # 终端（Emacs 风格快捷键 + Tokyo Night 主题）
     ├── clash/merge-hk.yaml   # 翻墙规则（香港模式）
     ├── clash/merge-cn.yaml   # 翻墙规则（大陆模式）
     └── fcitx5/{classicui,pinyin}.conf  # 输入法主题与行为
@@ -501,7 +502,7 @@ Ghostty 是主终端模拟器，配置为 Emacs 风格快捷键
 | =Ctrl+Shift+Enter=      | 新建分割（自动方向）       |
 | =Ctrl+Shift+,=          | 重新加载配置               |
 
-Ghostty 使用 =Aura= 主题，=background-opacity = 0.8=，且
+Ghostty 使用 =tokyo-night= 主题，=background-opacity = 0.8=，且
 =term = xterm-256color= 以保证 SSH 到远程服务器时的兼容性。
 
 * 实验室服务器访问
