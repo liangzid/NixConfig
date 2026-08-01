@@ -55,31 +55,53 @@
     }];
     style = ''
       * {
-          font-family: "FiraCode Nerd Font", "Sarasa Gothic SC";
+          font-family: "FiraCode Nerd Font", "Sarasa UI SC";
           font-size: 13px;
           border: none;
           border-radius: 0;
+          min-height: 0;
       }
       window#waybar {
-          background: rgba(26,27,38,0.85);
-          border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-          transition-property: background-color;
-          transition-duration: .5s;
+          background: transparent;
+          border: none;
           color: #c0caf5;
-     }
-      #workspaces button {
-          padding: 0 5px;
-          color: #7aa2f7;
       }
-      # workspaces button.active {
-          color: #bb9af7;
+      #workspaces {
+          margin: 6px 4px;
+          padding: 2px 4px;
+          background: rgba(26, 27, 38, 0.55);
+          border: 1px solid rgba(122, 162, 247, 0.35);
+          border-radius: 10px;
+      }
+      #workspaces button {
+          padding: 0 8px;
+          color: #7aa2f7;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+      }
+      #workspaces button.active {
+          background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+          color: #1a1b26;
+      }
+      #workspaces button:hover {
+          color: #7dcfff;
+          background: rgba(122, 162, 247, 0.2);
+      }
+      #window {
+          margin: 6px 4px;
+          padding: 0 12px;
+          background: rgba(26, 27, 38, 0.55);
+          border: 1px solid rgba(122, 162, 247, 0.35);
+          border-radius: 10px;
+          color: #c0caf5;
       }
 
       #cpu, #memory, #network, #battery, #clock, #tray {
-          padding: 0 10px;
-          margin: 4px 2px;
-          background-color: rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
+          margin: 6px 2px;
+          padding: 0 12px;
+          background: rgba(26, 27, 38, 0.55);
+          border: 1px solid rgba(122, 162, 247, 0.35);
+          border-radius: 10px;
       }
       #cpu { color: #7aa2f7; }
       #memory { color: #bb9af7; }
@@ -87,9 +109,15 @@
       #battery { color: #9ece6a; }
       #battery.warning { color: #e0af68; }
       #battery.critical { color: #f7768e; }
-      #clock {
+      #clock { color: #c0caf5; }
+      #tray { padding: 0 8px; }
+      tooltip {
+          background-color: #1a1b26;
+          border: 1px solid #3b4261;
+          border-radius: 8px;
+      }
+      tooltip label {
           color: #c0caf5;
-          background-color: transparent;
       }
      '';
   };
