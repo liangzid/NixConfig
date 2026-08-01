@@ -160,7 +160,7 @@ nix-config/
     ├── ghostty/config        # Terminal with Aura theme
     ├── clash/merge-hk.yaml   # GFW bypass rules (Hong Kong mode)
     ├── clash/merge-cn.yaml   # GFW bypass rules (Mainland mode)
-    └── fcitx5/{classicui,pinyin}.conf  # Input method theming & behaviour
+    └── (fcitx5 config now declarative via i18n.inputMethod.fcitx5.settings)
 #+end_src
 
 * Machine-Specific Settings — Read This First
