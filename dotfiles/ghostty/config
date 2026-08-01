@@ -1,7 +1,7 @@
-theme = Aura
+theme = tokyo-night
 
 term = xterm-256color
-background-opacity = 0.8
+background-opacity = 1.0
 
 font-family = FiraCode Nerd Font
 font-size = 11
