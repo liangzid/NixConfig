@@ -3,3 +3,4 @@ result
 *.qcow2
 *undo-tree*
 /records/
+hosts/nixos/env-private.json

@@ -32,7 +32,6 @@
 
     pavucontrol
 
-    wl-clipboard
     w3m
     poppler-utils
     aspell
@@ -134,6 +133,42 @@
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     WLR_NO_HARDWARE_CURSORS = "1";
   };
+
+  # ---- sops-nix：密钥管理（替代已废弃的 hosts/nixos/env-private.json）----
+  # 密钥文件 secrets/secrets.yaml 用 age 加密（.sops.yaml 定义接收者），
+  # 解密用的 age 密钥由 ~/.ssh/id_ed25519 在激活时自动转换而来。
+  sops = {
+    defaultSopsFile = ../../secrets/secrets.yaml;
+    age.sshKeyPaths = [ "/home/zi/.ssh/id_ed25519" ];
+    secrets.DEEPSEEK_API_KEY.path =
+      "/home/zi/.config/sops-nix/secrets/DEEPSEEK_API_KEY";
+  };
+
+  # 把密钥导出到全局用户会话：
+  # - systemd user 服务（含之后启动的 user units）由 set-environment 提供；
+  # - D-Bus 激活的程序由 dbus-update-activation-environment 提供；
+  # - Hyprland 直接 exec 的程序从登录 shell 继承（下方 bash initExtra）。
+  # 密钥变更后需要重启该服务或重新登录才会刷新。
+  systemd.user.services.sops-secrets-env = {
+    Unit = {
+      Description = "Export sops-nix secrets into the user session";
+      After = [ "sops-nix.service" ];
+      Requires = [ "sops-nix.service" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = toString (pkgs.writeShellScript "sops-secrets-env" ''
+        keyfile="${config.sops.secrets.DEEPSEEK_API_KEY.path}"
+        if [[ -r "$keyfile" ]]; then
+          export DEEPSEEK_API_KEY="$(cat "$keyfile")"
+          ${pkgs.systemd}/bin/systemctl --user set-environment DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY"
+          ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd DEEPSEEK_API_KEY || true
+        fi
+      '');
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
   home.file."Pictures/Wallpapers" = {
     source = ../../dotfiles/wallpapers;
     recursive = true;
@@ -152,109 +187,124 @@
     };
 
   programs.bash.enable = true;
+  # home.sessionVariables 不支持命令替换，密钥在激活时解密为普通文件，
+  # 所以在 bash 启动时读文件导出。
+  programs.bash.initExtra = ''
+    export DEEPSEEK_API_KEY="$(cat ${config.sops.secrets.DEEPSEEK_API_KEY.path})"
+  '';
 
 
   programs.ssh = {
     enable = true;
-    enableDefaultConfig = true;
-    matchBlocks = {
+    # 保持开启：HM 统一生成 ~/.ssh/config（settings 是唯一来源）。
+    # 旧的手动文件由 flake.nix 里的 home-manager.backupFileExtension
+    # 在下次激活时自动备份为 config.backup，不会中断激活。
+    # matchBlocks 已弃用，改用等价的 settings（OpenSSH 原生指令名）。
+    enableDefaultConfig = false;
+    settings = {
+      # 显式保留旧 enableDefaultConfig 的默认值，避免未来默认值移除后行为变化。
       "*" = {
-        extraOptions = {
-          ServerAliveInterval = "15";
-          ServerAliveCountMax = "8";
-          TCPKeepAlive = "yes";
-          AddKeysToAgent = "yes";
-          StrictModes = "no";
-        };
+        ForwardAgent = false;
+        AddKeysToAgent = "yes";
+        Compression = false;
+        ServerAliveInterval = 15;
+        ServerAliveCountMax = 8;
+        HashKnownHosts = false;
+        UserKnownHostsFile = "~/.ssh/known_hosts";
+        ControlMaster = "no";
+        ControlPath = "~/.ssh/master-%r@%n:%p";
+        ControlPersist = "no";
+        TCPKeepAlive = "yes";
+        StrictModes = "no";
       };
-      "is1" = {
-        hostname = "is1.astaple.com";
-        user = "zi";
+      is1 = {
+        HostName = "is1.astaple.com";
+        User = "zi";
       };
-      "gs10" = {
-        hostname = "gs10.astaple.com";
-        user = "zi";
+      gs10 = {
+        HostName = "gs10.astaple.com";
+        User = "zi";
       };
-      "gs10o" = {
-        hostname = "gs10.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs10o = {
+        HostName = "gs10.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "gs11" = {
-        hostname = "gs11.astaple.com";
-        user = "zi";
+      gs11 = {
+        HostName = "gs11.astaple.com";
+        User = "zi";
       };
-      "gs11o" = {
-        hostname = "gs11.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs11o = {
+        HostName = "gs11.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "gs12" = {
-        hostname = "gs12.astaple.com";
-        user = "zi";
+      gs12 = {
+        HostName = "gs12.astaple.com";
+        User = "zi";
       };
-      "gs12o" = {
-        hostname = "gs12.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs12o = {
+        HostName = "gs12.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "gs13" = {
-        hostname = "gs13.astaple.com";
-        user = "zi";
+      gs13 = {
+        HostName = "gs13.astaple.com";
+        User = "zi";
       };
-      "gs13o" = {
-        hostname = "gs13.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs13o = {
+        HostName = "gs13.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "gs14" = {
-        hostname = "gs14.astaple.com";
-        user = "zi";
+      gs14 = {
+        HostName = "gs14.astaple.com";
+        User = "zi";
       };
-      "gs14o" = {
-        hostname = "gs14.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs14o = {
+        HostName = "gs14.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "gs15" = {
-        hostname = "gs15.astaple.com";
-        user = "zi";
+      gs15 = {
+        HostName = "gs15.astaple.com";
+        User = "zi";
       };
-      "gs15o" = {
-        hostname = "gs15.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs15o = {
+        HostName = "gs15.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "gs16" = {
-        hostname = "gs16.astaple.com";
-        user = "zi";
+      gs16 = {
+        HostName = "gs16.astaple.com";
+        User = "zi";
       };
-      "gs16o" = {
-        hostname = "gs16.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      gs16o = {
+        HostName = "gs16.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "cs1" = {
-        hostname = "cs1.astaple.com";
-        user = "zi";
+      cs1 = {
+        HostName = "cs1.astaple.com";
+        User = "zi";
       };
-      "cs1o" = {
-        hostname = "cs1.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      cs1o = {
+        HostName = "cs1.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "cs2" = {
-        hostname = "cs2.astaple.com";
-        user = "zi";
+      cs2 = {
+        HostName = "cs2.astaple.com";
+        User = "zi";
       };
-      "cs2o" = {
-        hostname = "cs2.astaple.com";
-        user = "zi";
-        proxyJump = "is1";
+      cs2o = {
+        HostName = "cs2.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
       };
-      "moreoverai" = {
-        hostname = "139.59.220.113";
-        user = "ronghua";
+      moreoverai = {
+        HostName = "139.59.220.113";
+        User = "ronghua";
       };
     };
   };

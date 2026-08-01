@@ -1,0 +1,22 @@
+# sops-nix 加密规则
+#
+# 同一把 ~/.ssh/id_ed25519 注册两种接收者形式（密钥相同）：
+# 1. age1zjcl...g59wxy9：nixpkgs 的 ssh-to-age（Go 1.3.0，与
+#    sops-install-secrets 内置转换器同版本）输出，BIP-173 bech32；
+#    激活时由 SSH 私钥生成 AGE-SECRET-KEY 解密标准 X25519 stanza，
+#    不依赖 $HOME。
+# 2. ssh-ed25519 公钥原文：sops 3.9+ 原生支持，供
+#    `sops -d --age ~/.ssh/id_ed25519` 编辑/解密时直接使用。
+#
+# 注意：不要用 Rust 版 ssh-to-age crate 的输出来替换本文件，它输出
+# bech32m 编码，实测会被 sops 3.13 拒绝（invalid checksum）。
+keys:
+  - &zi age1zjcl4sse9v29vkrqp22u8hrt2hrfghq4t456dxycer9ae2xd45gq59wxy9
+  - &zi_ssh ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJpznD9z6HVyBQiTsh6ZTsMiRFuDAm2fjFam4N4H555l
+
+# 本仓库只有 secrets/secrets.yaml 一份 sops 文件，使用全局规则即可。
+creation_rules:
+  - key_groups:
+      - age:
+          - *zi
+          - *zi_ssh

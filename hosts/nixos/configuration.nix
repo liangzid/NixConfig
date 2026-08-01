@@ -15,6 +15,9 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # 限制引导菜单保留的世代数，防止 300M 的 ESP 被旧内核/initrd 塞满
+  # （systemd-boot 每个世代约 56M：kernel 14M + initrd 42M）。
+  boot.loader.systemd-boot.configurationLimit = 4;
 
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -79,10 +82,27 @@
     max-jobs = 2;
     cores = 2;
     http2 = false;
-    extra-substituters = [ "https://cache.numtide.com" ];
+    # 让 nix-shell / nix 命令默认可用 flakes 语法（nixos-rebuild 内部自带）。
+    experimental-features = [ "nix-command" "flakes" ];
+    extra-substituters = [
+      "https://cache.numtide.com"
+      "https://hyprland.cachix.org"
+      "https://nix-community.cachix.org"
+      "https://cache.thalheim.io"
+    ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "hyprland.cachix.org-1:a7pgxzMz7+chwmg3VQLluhnv4v3C4Y0sYc5LmPzO2v0="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "cache.thalheim.io-1:R7msbosLEZKrxk/lKxf9BTjOOH7Ax3H0Qj0/6wiHOgc="
     ];
+  };
+
+  # 自动回收 /nix/store 中 7 天前的旧世代，避免无限膨胀。
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -145,6 +165,12 @@
     postgresql_17
     docker-compose
     openssl
+    # WiFi AP / sniffing tools
+    iw
+    hostapd
+    dnsmasq
+    tcpdump
+    tshark
 
 
     wechat-uos
