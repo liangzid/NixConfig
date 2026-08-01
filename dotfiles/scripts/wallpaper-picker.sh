@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
+WALLPAPER_DIRS=("$HOME/Pictures/Wallpapers" "$HOME/Pictures/Images")
 
 set_wallpaper() {
     local bg
-    bg=$(find -L "$WALLPAPER_DIR" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | shuf -n 1)
+    bg=$(for dir in "${WALLPAPER_DIRS[@]}"; do
+        [ -d "$dir" ] && find -L "$dir" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) ! -name "screenshot_*" 2>/dev/null
+    done | shuf -n 1)
     if [ -n "$bg" ]; then
         awww img "$bg" --transition-type wave --transition-angle 30 --transition-step 90 --transition-fps 60
     fi
@@ -18,6 +20,6 @@ fi
 set_wallpaper
 
 while true; do
-    sleep 300
+    sleep 180
     set_wallpaper
 done
