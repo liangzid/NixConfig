@@ -175,6 +175,13 @@
     force = true;
   };
 
+  # images/ 是壁纸投放目录（新壁纸直接放这里即可进入自动轮换）
+  home.file."Pictures/Images" = {
+    source = ../../images;
+    recursive = true;
+    force = true;
+  };
+
   home.file."scripts/wallpaper-picker.sh" = {
     source = ../../dotfiles/scripts/wallpaper-picker.sh;
     executable = true;
@@ -350,6 +357,8 @@
   xdg.configFile."wofi/style.css".force = true;
   xdg.configFile."wofi/style.css".source = ../../dotfiles/wofi/style.css;
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
+  xdg.configFile."dunst/dunstrc".force = true;
+  xdg.configFile."dunst/dunstrc".source = ../../dotfiles/dunst/dunstrc;
   xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
   xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
   home.activation.cloneEmacs = config.lib.dag.entryAfter ["writeBoundary"] ''
