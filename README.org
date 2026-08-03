@@ -156,7 +156,7 @@ nix-config/
 │       ├── waybar.nix        # Status bar with tokyonight theme
 │       └── gtk.nix           # GTK theme + dark mode
 └── dotfiles/                 # Configuration files managed by home-manager
-    ├── hypr/hyprland.conf    # Hyprland keybindings + autostart
+    ├── hypr/hyprland.lua     # Hyprland keybindings + autostart
     ├── wofi/{config,style.css}
     ├── ghostty/config        # Terminal with Tokyo Night theme
     ├── clash/merge-hk.yaml   # GFW bypass rules (Hong Kong mode)
@@ -475,7 +475,7 @@ with this config (the alias is set in =configuration.nix=).
 ** Wofi / launcher not showing input method candidates
 
 Ensure you started =fcitx5= (add =fcitx5 -d= to your Hyprland autostart in
-[[./dotfiles/hypr/hyprland.conf][hyprland.conf]]). On Wayland, =GTK_IM_MODULE= is intentionally *unset*
+[[./dotfiles/hypr/hyprland.lua][hyprland.lua]]). On Wayland, =GTK_IM_MODULE= is intentionally *unset*
 in =home.nix= — fcitx5's Wayland input method frontend handles GTK apps
 (see [[./hosts/nixos/home.nix][home.nix]]). Some applications need =fcitx5= running first.
 
@@ -491,7 +491,7 @@ still missing, run:
 
 * Hyprland Keybindings
 
-All keybindings are defined in [[./dotfiles/hypr/hyprland.conf][dotfiles/hypr/hyprland.conf]]
+All keybindings are defined in [[./dotfiles/hypr/hyprland.lua][dotfiles/hypr/hyprland.lua]]
 
 | Key                     | Action                           |
 |-------------------------+----------------------------------|

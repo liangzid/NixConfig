@@ -350,8 +350,10 @@
     };
   };
 
-  xdg.configFile."hypr/hyprland.conf".force = true;
-  xdg.configFile."hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
+  # Hyprland >= 0.55 改用 Lua 配置（hyprland.lua），旧 hyprlang 的
+  # hyprland.conf 已不再被读取。
+  xdg.configFile."hypr/hyprland.lua".force = true;
+  xdg.configFile."hypr/hyprland.lua".source = ../../dotfiles/hypr/hyprland.lua;
   xdg.configFile."wofi/config".force = true;
   xdg.configFile."wofi/config".source = ../../dotfiles/wofi/config;
   xdg.configFile."wofi/style.css".force = true;
