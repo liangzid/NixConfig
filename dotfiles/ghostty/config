@@ -1,7 +1,7 @@
-theme = tokyo-night
+theme = TokyoNight
 
 term = xterm-256color
-background-opacity = 1.0
+background-opacity = 0.8
 
 font-family = FiraCode Nerd Font
 font-size = 11
