@@ -154,6 +154,7 @@
     llm-agents.claw-code
     llm-agents.code
     llm-agents.codex
+    llm-agents.cursor-agent
     llm-agents.crush
     llm-agents.omp
     llm-agents.opencode
