@@ -140,8 +140,11 @@
   sops = {
     defaultSopsFile = ../../secrets/secrets.yaml;
     age.sshKeyPaths = [ "/home/zi/.ssh/id_ed25519" ];
-    secrets.DEEPSEEK_API_KEY.path =
-      "/home/zi/.config/sops-nix/secrets/DEEPSEEK_API_KEY";
+    # 密钥名清单在 secrets/keys.nix（进 git，只含 key 名不含值）。
+    # 值在本地 secrets/secrets.yaml（.gitignore），由 scripts/set-secret.sh 维护。
+    secrets = pkgs.lib.genAttrs (import ../../secrets/keys.nix) (name: {
+      path = "/home/zi/.config/sops-nix/secrets/${name}";
+    });
   };
 
   # 把密钥导出到全局用户会话：
@@ -158,12 +161,14 @@
     Service = {
       Type = "oneshot";
       ExecStart = toString (pkgs.writeShellScript "sops-secrets-env" ''
-        keyfile="${config.sops.secrets.DEEPSEEK_API_KEY.path}"
-        if [[ -r "$keyfile" ]]; then
-          export DEEPSEEK_API_KEY="$(cat "$keyfile")"
-          ${pkgs.systemd}/bin/systemctl --user set-environment DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY"
-          ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd DEEPSEEK_API_KEY || true
-        fi
+        secrets_dir="/home/zi/.config/sops-nix/secrets"
+        for keyfile in "$secrets_dir"/*; do
+          [[ -f "$keyfile" && -r "$keyfile" ]] || continue
+          name="$(basename "$keyfile")"
+          value="$(cat "$keyfile")"
+          ${pkgs.systemd}/bin/systemctl --user set-environment "$name=$value"
+          ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd "$name" || true
+        done
       '');
     };
     Install.WantedBy = [ "default.target" ];
@@ -197,7 +202,12 @@
   # home.sessionVariables 不支持命令替换，密钥在激活时解密为普通文件，
   # 所以在 bash 启动时读文件导出。
   programs.bash.initExtra = ''
-    export DEEPSEEK_API_KEY="$(cat ${config.sops.secrets.DEEPSEEK_API_KEY.path})"
+    secrets_dir="/home/zi/.config/sops-nix/secrets"
+    for keyfile in "$secrets_dir"/*; do
+      [[ -f "$keyfile" && -r "$keyfile" ]] || continue
+      name="$(basename "$keyfile")"
+      export "$name=$(cat "$keyfile")"
+    done
   '';
 
   # OpenSSH 要求 ~/.ssh/config 属主为 root 或当前用户，而 HM 生成的
