@@ -4,8 +4,8 @@ set -euo pipefail
 # ======================================================================
 # SET-SECRET
 #
-# 1. 把 NAME=VALUE 加密写入 secrets/secrets.yaml（本地，不进 git），
-#    并同步更新 secrets/keys.nix（密钥名清单，进 git）。
+# 1. 把 NAME=VALUE 加密写入 secrets/hosts/<hostname>.yaml（当前设备密文，
+#    进 git，age 加密），并同步 secrets/keys.nix（密钥名清单，进 git）。
 # 2. 调用链：
 #      set-secret.sh
 #        ├─ nix run nixpkgs#ssh-to-age  生成本机 age 公钥（首次）
@@ -58,28 +58,56 @@ if [[ -z "$VALUE" ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SECRETS_FILE="$REPO_DIR/secrets/secrets.yaml"
+HOST_NAME="$(hostname)"
+SECRETS_FILE="$REPO_DIR/secrets/hosts/$HOST_NAME.yaml"
 KEYS_FILE="$REPO_DIR/secrets/keys.nix"
 SOPS_CFG="$REPO_DIR/.sops.yaml"
 SSH_KEY="${SSH_KEY:-$HOME/.ssh/id_ed25519}"
 
-# 1. 生成本地 .sops.yaml（若不存在）：复刻双公钥结构，
+# 1. 维护 .sops.yaml（per-host）：确保有当前 host 的接收者规则。
 #    age 公钥给 sops-nix 激活时解密，ssh 公钥给 sops CLI 加解密。
+[[ -f "$SSH_KEY.pub" ]] || { echo "错误: 找不到 $SSH_KEY.pub" >&2; exit 1; }
+age_pub="$(nix run nixpkgs#ssh-to-age -- -i "$SSH_KEY.pub")"
+ssh_pub="$(cut -d' ' -f1,2 "$SSH_KEY.pub")"
+
 if [[ ! -f "$SOPS_CFG" ]]; then
-  [[ -f "$SSH_KEY.pub" ]] || { echo "错误: 找不到 $SSH_KEY.pub" >&2; exit 1; }
-  age_pub="$(nix run nixpkgs#ssh-to-age -- -i "$SSH_KEY.pub")"
-  ssh_pub="$(cut -d' ' -f1,2 "$SSH_KEY.pub")"
   cat > "$SOPS_CFG" <<EOF
 keys:
-- &zi $age_pub
-- &zi_ssh $ssh_pub
+- &${HOST_NAME}_age $age_pub
+- &${HOST_NAME}_ssh $ssh_pub
 creation_rules:
-  - key_groups:
+  - path_regex: secrets/hosts/${HOST_NAME}\\.yaml\$
+    key_groups:
       - age:
-          - *zi
-          - *zi_ssh
+          - *${HOST_NAME}_age
+          - *${HOST_NAME}_ssh
 EOF
-  echo "==> 已生成本地 .sops.yaml（本机 ssh key）"
+  echo "==> 已生成本地 .sops.yaml（host: $HOST_NAME）"
+elif ! grep -q "secrets/hosts/${HOST_NAME}" "$SOPS_CFG"; then
+  python3 -c '
+import sys
+host, age_pub, ssh_pub, path = sys.argv[1:5]
+content = open(path).read()
+lines = content.rstrip("\n").split("\n")
+anchor_age = "- &" + host + "_age " + age_pub
+anchor_ssh = "- &" + host + "_ssh " + ssh_pub
+last = -1
+for i, ln in enumerate(lines):
+    if ln.startswith("- &"):
+        last = i
+if last < 0:
+    sys.exit(1)
+lines[last + 1:last + 1] = [anchor_age, anchor_ssh]
+rule = [
+    "  - path_regex: secrets/hosts/" + host + "\\.yaml$",
+    "    key_groups:",
+    "      - age:",
+    "          - *" + host + "_age",
+    "          - *" + host + "_ssh",
+]
+open(path, "w").write("\n".join(lines).rstrip("\n") + "\n" + "\n".join(rule) + "\n")
+' "$HOST_NAME" "$age_pub" "$ssh_pub" "$SOPS_CFG"
+  echo "==> 已向 .sops.yaml 追加 host: $HOST_NAME 的接收者规则"
 fi
 
 # 2. 解密现有密文（若存在）。解密失败必须中止，避免静默覆盖丢失旧密钥。
@@ -116,11 +144,21 @@ if not found:
 sys.stdout.write("\n".join(out) + "\n")
 ' "$NAME" "$VALUE")"
 
-# 4. 加密写回（临时文件用 .yaml 后缀 + 显式类型，避免 sops 输出成 JSON）。
-tmp="$(mktemp --suffix=.yaml)"
-printf '%s' "$plain" > "$tmp"
-SOPS_CONFIG="$SOPS_CFG" nix run nixpkgs#sops -- -e --input-type yaml --output-type yaml "$tmp" > "$SECRETS_FILE"
-rm -f "$tmp"
+# 4. 加密写回（per-host：明文暂写目标路径，sops -e -i 原地加密，
+#    这样 path_regex 才能匹配 secrets/hosts/<hostname>.yaml）。
+mkdir -p "$(dirname "$SECRETS_FILE")"
+backup=""
+if [[ -f "$SECRETS_FILE" ]]; then
+  backup="$(mktemp --suffix=.yaml)"
+  cp "$SECRETS_FILE" "$backup"
+fi
+printf '%s' "$plain" > "$SECRETS_FILE"
+if ! SOPS_CONFIG="$SOPS_CFG" nix run nixpkgs#sops -- -e -i --input-type yaml --output-type yaml "$SECRETS_FILE"; then
+  [[ -n "$backup" ]] && cp "$backup" "$SECRETS_FILE"
+  echo "错误: 加密 $SECRETS_FILE 失败" >&2
+  exit 1
+fi
+[[ -n "$backup" ]] && rm -f "$backup"
 
 # 5. 同步 keys.nix（key 名清单，进 git）。
 if [[ ! -f "$KEYS_FILE" ]]; then
@@ -145,7 +183,7 @@ fi
 
 cat <<EOF
 
-==> 已加密写入 $NAME → secrets/secrets.yaml，并同步 secrets/keys.nix
+==> 已加密写入 $NAME → secrets/hosts/$HOST_NAME.yaml，并同步 secrets/keys.nix
 下一步：
   sudo nixos-rebuild switch --flake .#nixos
   systemctl --user restart sops-secrets-env.service

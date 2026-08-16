@@ -4,5 +4,3 @@ result
 *undo-tree*
 /records/
 hosts/nixos/env-private.json
-secrets/secrets.yaml
-.sops.yaml

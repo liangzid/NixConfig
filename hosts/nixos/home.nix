@@ -135,13 +135,14 @@
   };
 
   # ---- sops-nix：密钥管理（替代已废弃的 hosts/nixos/env-private.json）----
-  # 密钥文件 secrets/secrets.yaml 用 age 加密（.sops.yaml 定义接收者），
+  # 每个 host 一份密文 secrets/hosts/<hostname>.yaml（age 加密，.sops.yaml
+  # 定义各 host 的接收者）。密文进 git 是安全的：age 加密，无私钥解不开。
   # 解密用的 age 密钥由 ~/.ssh/id_ed25519 在激活时自动转换而来。
   sops = {
-    defaultSopsFile = ../../secrets/secrets.yaml;
+    defaultSopsFile = ../../secrets/hosts/nixos.yaml;
     age.sshKeyPaths = [ "/home/zi/.ssh/id_ed25519" ];
-    # 密钥名清单在 secrets/keys.nix（进 git，只含 key 名不含值）。
-    # 值在本地 secrets/secrets.yaml（.gitignore），由 scripts/set-secret.sh 维护。
+    # 密钥名清单在 secrets/keys.nix（进 git，只含 key 名不含值），
+    # 由 scripts/set-secret.sh 维护。
     secrets = pkgs.lib.genAttrs (import ../../secrets/keys.nix) (name: {
       path = "/home/zi/.config/sops-nix/secrets/${name}";
     });
