@@ -7,7 +7,7 @@
       height = 30;
       modules-left = [ "hyprland/workspaces" "hyprland/mode" ];
       modules-center = [ "hyprland/window" ];
-      modules-right = [ "network" "cpu" "memory" "clock" "clock#date" "tray" ];
+      modules-right = [ "network" "cpu" "memory" "pulseaudio" "clock" "clock#date" "tray" ];
 
       "cpu" = {
         format = "  {usage}%";
@@ -24,6 +24,16 @@
         format-ethernet = "󰈀  {ifname}";
         format-disconnected = "󰖪  Disconnected";
         tooltip-format = "{ipaddr}/{cidr}";
+      };
+
+      "pulseaudio" = {
+        format = "{icon} {volume}%";
+        format-muted = "  muted";
+        format-icons.default = [ "" "" "" ];
+        on-click = "pavucontrol";
+        on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        scroll-step = 5;
+        tooltip = true;
       };
 
       "clock" = {
@@ -110,7 +120,7 @@
           color: #c0caf5;
       }
 
-      #cpu, #memory, #network, #clock, #tray {
+      #cpu, #memory, #network, #pulseaudio, #clock, #tray {
           margin: 6px 2px;
           padding: 0 12px;
           background: rgba(26, 27, 38, 0.55);
@@ -120,6 +130,7 @@
       #cpu { color: #7aa2f7; }
       #memory { color: #bb9af7; }
       #network { color: #7dcfff; }
+      #pulseaudio { color: #9ece6a; }
       #clock { color: #c0caf5; }
       #tray { padding: 0 8px; }
       tooltip {

@@ -33,6 +33,7 @@
 
     pavucontrol
     gnome-calendar
+    playerctl
 
     w3m
     poppler-utils
