@@ -7,7 +7,7 @@
       height = 30;
       modules-left = [ "hyprland/workspaces" "hyprland/mode" ];
       modules-center = [ "hyprland/window" ];
-      modules-right = [ "network" "cpu" "memory" "battery" "clock" "tray" ];
+      modules-right = [ "network" "cpu" "memory" "clock" "clock#date" "tray" ];
 
       "cpu" = {
         format = "  {usage}%";
@@ -26,21 +26,35 @@
         tooltip-format = "{ipaddr}/{cidr}";
       };
 
-      "battery" = {
-        states = {
-          warning = 30;
-          critical = 15;
-        };
-        format = "{icon} {capacity}%";
-        format-charging = "󰂄 {capacity}%";
-        format-plugged = "  {capacity}%";
-        format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
+      "clock" = {
+        interval = 1;
+        format = "  {:%H:%M:%S}";
+        tooltip-format = "{:%Y-%m-%d %A}";
       };
 
-      "clock" = {
-        format = "  {:%H:%M}";
-        format-alt = "󰃭  {:%Y-%m-%d}";
-        tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+      # 与 clock 拆开：悬停月历，滚轮翻月，左键打开 gnome-calendar，右键切年/月视图。
+      "clock#date" = {
+        interval = 60;
+        format = "󰃭  {:%Y-%m-%d %a}";
+        tooltip-format = "<tt>{calendar}</tt>";
+        calendar = {
+          mode = "month";
+          weeks-pos = "right";
+          on-scroll = 1;
+          format = {
+            months = "<span color='#7aa2f7'><b>{}</b></span>";
+            days = "<span color='#c0caf5'>{}</span>";
+            weeks = "<span color='#3b4261'><b>W{}</b></span>";
+            weekdays = "<span color='#7dcfff'><b>{}</b></span>";
+            today = "<span color='#bb9af7'><b><u>{}</u></b></span>";
+          };
+        };
+        actions = {
+          on-click-right = "mode";
+          on-scroll-up = "shift_up";
+          on-scroll-down = "shift_down";
+        };
+        on-click = "${pkgs.gnome-calendar}/bin/gnome-calendar";
       };
 
       "tray" = {
@@ -96,7 +110,7 @@
           color: #c0caf5;
       }
 
-      #cpu, #memory, #network, #battery, #clock, #tray {
+      #cpu, #memory, #network, #clock, #tray {
           margin: 6px 2px;
           padding: 0 12px;
           background: rgba(26, 27, 38, 0.55);
@@ -106,9 +120,6 @@
       #cpu { color: #7aa2f7; }
       #memory { color: #bb9af7; }
       #network { color: #7dcfff; }
-      #battery { color: #9ece6a; }
-      #battery.warning { color: #e0af68; }
-      #battery.critical { color: #f7768e; }
       #clock { color: #c0caf5; }
       #tray { padding: 0 8px; }
       tooltip {

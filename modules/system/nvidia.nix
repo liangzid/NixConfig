@@ -7,8 +7,8 @@
   };
 
   hardware.nvidia = {
-    # Close source
-    open = false;
+    # RTX 4080（Ada）：560+ 驱动应使用开源内核模块。
+    open = true;
 
     # Stable version
     package = config.boot.kernelPackages.nvidiaPackages.stable;

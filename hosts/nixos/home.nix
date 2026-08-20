@@ -23,7 +23,8 @@
 
     grim
     slurp
-    swappy
+    grimblast
+    satty
 
     wl-clipboard
     xclip
@@ -31,6 +32,7 @@
     awww
 
     pavucontrol
+    gnome-calendar
 
     w3m
     poppler-utils
@@ -126,62 +128,18 @@
     # pi-coding-agent (Nix-managed, disable self-update checks)
     PI_OFFLINE = "1";
 
-    # For Nvidia
-    LIBVA_DRIVER_NAME = "nvidia";
-    XDG_SESSION_TYPE = "wayland";
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    WLR_NO_HARDWARE_CURSORS = "1";
+    # NVIDIA / Wayland 会话变量在 hyprland.lua 的 hl.env 里设置，
+    # 不要放进 sessionVariables：TTY 与 SSH 也会继承。
   };
 
-  # ---- sops-nix：密钥管理（替代已废弃的 hosts/nixos/env-private.json）----
-  # 每个 host 一份密文 secrets/hosts/<hostname>.yaml（age 加密，.sops.yaml
-  # 定义各 host 的接收者）。密文进 git 是安全的：age 加密，无私钥解不开。
-  # 解密用的 age 密钥由 ~/.ssh/id_ed25519 在激活时自动转换而来。
-  sops = {
-    defaultSopsFile = ../../secrets/hosts/nixos.yaml;
-    age.sshKeyPaths = [ "/home/zi/.ssh/id_ed25519" ];
-    # 密钥名清单在 secrets/keys.nix（进 git，只含 key 名不含值），
-    # 由 scripts/set-secret.sh 维护。
-    secrets = pkgs.lib.genAttrs (import ../../secrets/keys.nix) (name: {
-      path = "/home/zi/.config/sops-nix/secrets/${name}";
-    });
-  };
-
-  # 把密钥导出到全局用户会话：
-  # - systemd user 服务（含之后启动的 user units）由 set-environment 提供；
-  # - D-Bus 激活的程序由 dbus-update-activation-environment 提供；
-  # - Hyprland 直接 exec 的程序从登录 shell 继承（下方 bash initExtra）。
-  # 密钥变更后需要重启该服务或重新登录才会刷新。
-  systemd.user.services.sops-secrets-env = {
-    Unit = {
-      Description = "Export sops-nix secrets into the user session";
-      After = [ "sops-nix.service" ];
-      Requires = [ "sops-nix.service" ];
-    };
-    Service = {
-      Type = "oneshot";
-      ExecStart = toString (pkgs.writeShellScript "sops-secrets-env" ''
-        secrets_dir="/home/zi/.config/sops-nix/secrets"
-        for keyfile in "$secrets_dir"/*; do
-          [[ -f "$keyfile" && -r "$keyfile" ]] || continue
-          name="$(basename "$keyfile")"
-          value="$(cat "$keyfile")"
-          ${pkgs.systemd}/bin/systemctl --user set-environment "$name=$value"
-          ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd "$name" || true
-        done
-      '');
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
-
+  # 壁纸只轮换仓库里的图：dotfiles/wallpapers + images/（排除 screenshot_*）。
+  # 新壁纸放进仓库对应目录，不要往 ~/Pictures 里丢散文件。
   home.file."Pictures/Wallpapers" = {
     source = ../../dotfiles/wallpapers;
     recursive = true;
     force = true;
   };
 
-  # images/ 是壁纸投放目录（新壁纸直接放这里即可进入自动轮换）
   home.file."Pictures/Images" = {
     source = ../../images;
     recursive = true;
@@ -194,21 +152,23 @@
     force = true;
   };
 
+  home.file."scripts/screenshot.sh" = {
+    source = ../../dotfiles/scripts/screenshot.sh;
+    executable = true;
+    force = true;
+  };
+
   home.file."${config.xdg.dataHome}/fonts/wps-fonts" = {
     source = ../../dotfiles/fonts/wps;
     recursive = true;
     };
 
   programs.bash.enable = true;
-  # home.sessionVariables 不支持命令替换，密钥在激活时解密为普通文件，
-  # 所以在 bash 启动时读文件导出。
+  # 本机密钥：~/.bashrc.local（不进 git）。改完新开 shell 即可，不必 rebuild。
   programs.bash.initExtra = ''
-    secrets_dir="/home/zi/.config/sops-nix/secrets"
-    for keyfile in "$secrets_dir"/*; do
-      [[ -f "$keyfile" && -r "$keyfile" ]] || continue
-      name="$(basename "$keyfile")"
-      export "$name=$(cat "$keyfile")"
-    done
+    if [ -f "$HOME/.bashrc.local" ]; then
+      . "$HOME/.bashrc.local"
+    fi
   '';
 
   # OpenSSH 要求 ~/.ssh/config 属主为 root 或当前用户，而 HM 生成的

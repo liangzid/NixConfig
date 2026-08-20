@@ -73,8 +73,8 @@
     packages = with pkgs; [];
   };
 
-  # Docker service
-  virtualisation.docker.enable = true;
+  # 只用 rootless docker（DOCKER_HOST=/run/user/1000/docker.sock）。
+  # 不要同时 enable 系统级 dockerd：那会再跑一个 root 守护进程。
   virtualisation.docker.rootless = {
     enable = true;
     setSocketVariable = true;
@@ -93,13 +93,11 @@
       "https://cache.numtide.com"
       "https://hyprland.cachix.org"
       "https://nix-community.cachix.org"
-      "https://cache.thalheim.io"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       "hyprland.cachix.org-1:a7pgxzMz7+chwmg3VQLluhnv4v3C4Y0sYc5LmPzO2v0="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "cache.thalheim.io-1:R7msbosLEZKrxk/lKxf9BTjOOH7Ax3H0Qj0/6wiHOgc="
     ];
   };
 
@@ -216,7 +214,6 @@
   zramSwap.enable = true;
 
   environment.sessionVariables = {
-    GDK_BACKEND = "wayland";
     TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";
   };
 

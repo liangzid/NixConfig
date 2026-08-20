@@ -3,20 +3,20 @@ set -euo pipefail
 
 REPO_URL="https://github.com/liangzid/nix-config.git"
 CONFIG_DIR="/home/zi/code/NixConfig"
-FLAKE_REF=".#nixos"
+# nixos-rebuild --flake PATH#ATTR；ATTR 不能再带 ".#"，否则会拼成 PATH#.#nixos。
+FLAKE_ATTR="nixos"
 
 print_usage() {
   echo "Usage:"
   echo "  $0 install   # Fresh install from NixOS ISO"
   echo "  $0 apply     # Apply config on existing NixOS system"
-  echo "  $0 iso       # Generate NixOS ISO from this config"
 }
 
 cmd_apply() {
   echo "==> Applying NixOS configuration..."
 
   if [ -f "$CONFIG_DIR/flake.nix" ]; then
-    sudo nixos-rebuild switch --flake "$CONFIG_DIR#$FLAKE_REF"
+    sudo nixos-rebuild switch --flake "$CONFIG_DIR#$FLAKE_ATTR"
   else
     echo "Error: flake.nix not found at $CONFIG_DIR"
     echo "Clone the repo first or set CONFIG_DIR correctly."
@@ -63,21 +63,14 @@ cmd_install() {
   git -C "$TARGET_DIR" commit -m "install: add hardware-config for this machine"
 
   # Install
-  nixos-install --flake "$TARGET_DIR#$FLAKE_REF"
+  nixos-install --flake "$TARGET_DIR#$FLAKE_ATTR"
 
   echo "==> Installation complete! Reboot and enjoy."
   echo "    After reboot, the config will be at ${TARGET_DIR#/mnt}."
 }
 
-cmd_iso() {
-  echo "==> Building NixOS ISO..."
-  nix build "$FLAKE_REF".config.system.build.iso
-  echo "ISO built at ./result"
-}
-
 case "${1:-help}" in
   install) cmd_install ;;
   apply)   cmd_apply ;;
-  iso)     cmd_iso ;;
   *)       print_usage ;;
 esac

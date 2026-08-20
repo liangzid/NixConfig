@@ -9,11 +9,9 @@
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     llm-agents.url = "github:numtide/llm-agents.nix";
-    sops-nix.url = "github:Mic92/sops-nix";
-    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, llm-agents, sops-nix, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, llm-agents, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
   in {
@@ -34,7 +32,6 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.sharedModules = [ sops-nix.homeManagerModules.sops ];
           # 升级/重新激活时若文件内容冲突，先备份旧文件而不是中止激活。
           # 之前 home-manager-zi.service 反复因 ~/.ssh/config 冲突而激活失败。
           home-manager.backupFileExtension = "backup";

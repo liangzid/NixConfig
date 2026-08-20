@@ -17,6 +17,13 @@ hl.monitor({
 -- 光标主题与尺寸（GTK 侧由 gtk.nix 的 settings.ini 指定，这里覆盖 XWayland/Qt）
 hl.env("XCURSOR_SIZE", "24")
 hl.env("XCURSOR_THEME", "Numix-Cursor")
+-- 仅 Hyprland 会话：不要写进 home.sessionVariables（TTY/SSH 会误带上）
+hl.env("GDK_BACKEND", "wayland")
+hl.env("XDG_SESSION_TYPE", "wayland")
+hl.env("LIBVA_DRIVER_NAME", "nvidia")
+hl.env("GBM_BACKEND", "nvidia-drm")
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+hl.env("WLR_NO_HARDWARE_CURSORS", "1")
 
 local lock_cmd = "swaylock -f -S --effect-blur 7x5 --effect-vignette 0.3:0.4"
 
@@ -25,7 +32,7 @@ local lock_cmd = "swaylock -f -S --effect-blur 7x5 --effect-vignette 0.3:0.4"
 --------------------
 -- 关键：同步环境变量到 dbus 和 systemd，解决 GTK 软件启动慢或权限问题
 hl.on("hyprland.start", function()
-    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DEEPSEEK_API_KEY")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP GDK_BACKEND XDG_SESSION_TYPE LIBVA_DRIVER_NAME GBM_BACKEND __GLX_VENDOR_LIBRARY_NAME")
     hl.exec_cmd("waybar")
     hl.exec_cmd("dunst")
     hl.exec_cmd("udiskie -t")
@@ -236,7 +243,7 @@ hl.bind(main_mod .. " + L", hl.dsp.exec_cmd(lock_cmd))
 --------------------
 ---- SCREENSHOTS ----
 --------------------
-hl.bind("Print",           hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | swappy -f -"))
-hl.bind("XF86Calculator",  hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | swappy -f -"))
-hl.bind("CTRL + Print",    hl.dsp.exec_cmd("grim - | wl-copy && notify-send \"Screenshot\" \"Fullscreen captured\""))
-hl.bind("CTRL + XF86Calculator", hl.dsp.exec_cmd("grim - | wl-copy && notify-send \"Screenshot\" \"Fullscreen captured\""))
+hl.bind("Print",           hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
+hl.bind("XF86Calculator",  hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
+hl.bind("CTRL + Print",    hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh screen"))
+hl.bind("CTRL + XF86Calculator", hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh screen"))
