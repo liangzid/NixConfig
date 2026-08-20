@@ -1,11 +1,18 @@
 { config, pkgs, ... }: {
   xdg.portal = {
     enable = true;
-    # 注意：programs.hyprland.enable（nixpkgs 模块）会自动添加
-    # xdg-desktop-portal-hyprland（portalPackage）和 xdg-desktop-portal-gtk，
-    # 这里不要再重复添加，否则两个不同构建的 portal 包会提供同名
-    # xdg-desktop-portal-hyprland.service，导致 user-units 构建失败。
+    # programs.hyprland.enable 会带上 xdg-desktop-portal-hyprland。
+    # 这里只补 gtk（文件选择）。不要再把 hyprland portal 加进 extraPortals，
+    # 否则两个同名 user unit 会撞车。
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = "*";
+    config = {
+      common.default = [ "hyprland" "gtk" ];
+      hyprland = {
+        default = [ "hyprland" "gtk" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+        "org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
+        "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+      };
+    };
   };
 }
