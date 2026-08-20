@@ -7,8 +7,10 @@
   };
 
   hardware.nvidia = {
-    # RTX 4080（Ada）：560+ 驱动应使用开源内核模块。
-    open = true;
+    # Keep proprietary module until open=true is validated on a non-critical rebuild.
+    # (open=true was tried earlier; boot emergency on 2026-08-20 was disk UUID, not this,
+    # but do not flip open again without a known-good generation ready.)
+    open = false;
 
     # Stable version
     package = config.boot.kernelPackages.nvidiaPackages.stable;

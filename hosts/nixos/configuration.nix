@@ -129,8 +129,10 @@
 
   environment.shellAliases = {
     enw = "emacs -nw";
-    update = "sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos";
-    upgrade = "cd ~/code/NixConfig && nix --extra-experimental-features 'nix-command flakes' flake update && sudo nixos-rebuild switch --flake ~/code/NixConfig#nixos";
+    # path: 让 gitignored 的 hardware-configuration.nix 仍进入求值；
+    # 纯 git+file 只会看见已跟踪文件，容易误用云端/缺文件。
+    update = "sudo nixos-rebuild switch --flake path:$HOME/code/NixConfig#nixos";
+    upgrade = "cd $HOME/code/NixConfig && nix --extra-experimental-features 'nix-command flakes' flake update && sudo nixos-rebuild switch --flake path:$HOME/code/NixConfig#nixos";
     latexmain = "latexmk --pdflatex main.tex";
     gui = "start-hyprland";
     ec = "emacsclient";

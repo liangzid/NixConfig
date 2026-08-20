@@ -4,3 +4,5 @@ result
 *undo-tree*
 /records/
 hosts/nixos/env-private.json
+# Per-machine disk UUIDs — catastrophic if shared across hosts.
+hosts/nixos/hardware-configuration.nix
