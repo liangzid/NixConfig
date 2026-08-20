@@ -39,6 +39,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("fcitx5 -d --replace")
     hl.exec_cmd("bash $HOME/scripts/wallpaper-picker.sh")
     hl.exec_cmd("nm-applet --indicator")
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
 
     -- Auto-lock on idle is intentionally disabled. Display still powers off
     -- after 600s, and the screen is still locked on suspend / lid close.
@@ -197,6 +199,8 @@ hl.bind(main_mod .. " + Tab",   hl.dsp.window.cycle_next())
 -- T for terminal, X for menu (like emacs), E for Explorer
 hl.bind(main_mod .. " + K", hl.dsp.window.close())
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+-- Super+V 仍是浮动；历史剪贴板用 Super+Shift+V，避免抢键。
+hl.bind(main_mod .. " + SHIFT + V", hl.dsp.exec_cmd("bash $HOME/scripts/clipboard-hist.sh"))
 hl.bind(main_mod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind("CTRL + ALT + T",   hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(terminal))

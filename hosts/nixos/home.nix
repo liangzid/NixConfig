@@ -28,6 +28,7 @@
 
     wl-clipboard
     xclip
+    cliphist
 
     awww
 
@@ -155,6 +156,12 @@
 
   home.file."scripts/screenshot.sh" = {
     source = ../../dotfiles/scripts/screenshot.sh;
+    executable = true;
+    force = true;
+  };
+
+  home.file."scripts/clipboard-hist.sh" = {
+    source = ../../dotfiles/scripts/clipboard-hist.sh;
     executable = true;
     force = true;
   };
