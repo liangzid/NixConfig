@@ -7,11 +7,10 @@
     };
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
-    emacs-overlay.url = "github:nix-community/emacs-overlay";
     llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, emacs-overlay, llm-agents, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
   in {
@@ -21,7 +20,6 @@
 
         {
           nixpkgs.overlays = [
-            emacs-overlay.overlays.default
             llm-agents.overlays.shared-nixpkgs
           ];
         }
