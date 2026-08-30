@@ -1,0 +1,48 @@
+From: Zi Liang <zi1415926.liang@connect.polyu.hk>
+Date: Sun, 30 Aug 2026 00:00:00 +0800
+Subject: [PATCH] hyprland/workspaces: use Lua dispatch commands
+
+Waybar 0.15 still sends legacy Hyprland workspace dispatch commands.
+This configuration uses Hyprland 0.56 with the Lua configuration provider,
+which only accepts hl.dsp expressions on the dispatch socket.
+
+REVIEW: This is intentionally a narrow backport for the Lua-only Hyprland
+configuration in this repository. Remove it after nixpkgs ships a Waybar
+release containing the upstream Lua IPC support.
+---
+ src/modules/hyprland/workspace.cpp | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/modules/hyprland/workspace.cpp b/src/modules/hyprland/workspace.cpp
+index 21e7ef9..d58ff4a 100644
+--- a/src/modules/hyprland/workspace.cpp
++++ b/src/modules/hyprland/workspace.cpp
+@@ -71,20 +71,20 @@ bool Workspace::handleClicked(GdkEventButton* bt) const {
+     try {
+       if (id() > 0) {  // normal
+         if (m_workspaceManager.moveToMonitor()) {
+-          m_ipc.getSocket1Reply("dispatch focusworkspaceoncurrentmonitor " + std::to_string(id()));
++          m_ipc.getSocket1Reply("/dispatch hl.dsp.focus({ workspace = \"" + std::to_string(id()) + "\", on_current_monitor = true })");
+         } else {
+-          m_ipc.getSocket1Reply("dispatch workspace " + std::to_string(id()));
++          m_ipc.getSocket1Reply("/dispatch hl.dsp.focus({ workspace = \"" + std::to_string(id()) + "\" })");
+         }
+       } else if (!isSpecial()) {  // named (this includes persistent)
+         if (m_workspaceManager.moveToMonitor()) {
+-          m_ipc.getSocket1Reply("dispatch focusworkspaceoncurrentmonitor name:" + name());
++          m_ipc.getSocket1Reply("/dispatch hl.dsp.focus({ workspace = \"name:" + name() + "\", on_current_monitor = true })");
+         } else {
+-          m_ipc.getSocket1Reply("dispatch workspace name:" + name());
++          m_ipc.getSocket1Reply("/dispatch hl.dsp.focus({ workspace = \"name:" + name() + "\" })");
+         }
+       } else if (id() != -99) {  // named special
+-        m_ipc.getSocket1Reply("dispatch togglespecialworkspace " + name());
++        m_ipc.getSocket1Reply("/dispatch hl.dsp.workspace.toggle_special(\"" + name() + "\")");
+       } else {  // special
+-        m_ipc.getSocket1Reply("dispatch togglespecialworkspace");
++        m_ipc.getSocket1Reply("/dispatch hl.dsp.workspace.toggle_special()");
+       }
+       return true;
+     } catch (const std::exception& e) {
+-- 
+2.51.0
