@@ -60,14 +60,11 @@ hl.layer_rule({ match = { namespace = "dunst" },  blur = true, ignore_alpha = 0.
 ----------------------
 ---- WINDOW RULES ----
 ----------------------
--- REVIEW: Ghostty 不再禁用全局 blur；透明背景由 Hyprland 统一模糊。
+-- 终端保持清晰可读：透明背景直接透出壁纸，不走 compositor blur。
+hl.window_rule({ match = { class = "com.mitchellh.ghostty" }, no_blur = true })
 
--- 聚焦窗口强调：边框加粗 + 高亮渐变（替代原来的 dim 变暗效果）
-hl.window_rule({ match = { focus = true }, border_size = 3 })
-hl.window_rule({
-    match        = { focus = true },
-    border_color = { colors = { "rgba(7dcfffee)", "rgba(bb9af7ee)" }, angle = 45 },
-})
+-- 聚焦窗口仅略加粗边框，不再使用渐变高亮。
+hl.window_rule({ match = { focus = true }, border_size = 2 })
 
 --------------------
 ---- LOOK AND FEEL ----
@@ -76,23 +73,23 @@ hl.config({
     general = {
         gaps_in     = 4,
         gaps_out    = 3,
-        border_size = 2,
+        border_size = 1,
         col = {
-            active_border   = { colors = { "rgba(7dcfffee)", "rgba(bb9af7ee)" }, angle = 45 },
-            inactive_border = "rgba(3b4261cc)",
+            active_border   = "rgba(7aa2f799)",
+            inactive_border = "rgba(565f7388)",
         },
     },
 
     decoration = {
-        rounding         = 12,
+        rounding         = 0,
         active_opacity   = 1.0,
         inactive_opacity = 1.0,
 
         shadow = {
             enabled      = true,
-            range        = 20,
-            render_power = 3,
-            color        = "rgba(00000080)",
+            range        = 8,
+            render_power = 2,
+            color        = "rgba(00000055)",
         },
 
         blur = {
@@ -106,11 +103,7 @@ hl.config({
         },
 
         glow = {
-            enabled         = true,
-            range           = 12,
-            render_power    = 3,
-            color           = { colors = { "rgba(7dcfffcc)", "rgba(bb9af7cc)" }, angle = 45 },
-            color_inactive  = "rgba(3b426180)",
+            enabled = false,
         },
 
         motion_blur = {
@@ -150,8 +143,6 @@ set_animation("windowsIn",      12, "easeOutBack",  "popin 85%")
 set_animation("windowsOut",     8,  "easeOutCubic", "popin 90%")
 set_animation("windowsMove",    8,  "easeOutCubic")
 set_animation("border",         10, "easeOutCubic")
-set_animation("borderangle",    100, "linear",      "loop")
-set_animation("glowangle",      100, "linear",      "loop")
 set_animation("fade",           8,  "easeOutCubic")
 set_animation("fadeIn",         8,  "easeOutCubic")
 set_animation("fadeOut",        7,  "easeOutCubic")

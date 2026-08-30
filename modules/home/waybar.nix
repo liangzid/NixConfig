@@ -3,7 +3,7 @@
 #
 # 1. 提供 Hyprland 顶栏、工作区导航和系统状态组件。
 # 2. 调用链：Home Manager → patched Waybar → Hyprland Lua IPC。
-# 3. 修改历史：2026-08-30 修复 Lua 工作区点击并开始统一视觉层次。
+# 3. 修改历史：2026-08-30 修复 Lua 工作区点击；工作区按钮改为直角风格。
 #
 #     Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
 #     Copyright © 2026, Zi Liang, all rights reserved.
@@ -151,26 +151,20 @@ in
           padding: 0 9px;
           color: rgba(192, 202, 245, 0.72);
           background: transparent;
-          border-radius: 10px;
+          border-radius: 0;
           transition: all 0.2s ease;
       }
 
       #workspaces button.active {
-          background-image: linear-gradient(135deg, #7dcfff, #7aa2f7 48%, #bb9af7);
+          background: rgba(122, 162, 247, 0.88);
           color: #1a1b26;
-          box-shadow:
-              inset 0 1px rgba(255, 255, 255, 0.35),
-              0 0 10px rgba(122, 162, 247, 0.55);
+          box-shadow: none;
       }
 
       #workspaces button:hover {
           color: #ffffff;
-          background-image: linear-gradient(
-              135deg,
-              rgba(122, 162, 247, 0.38),
-              rgba(187, 154, 247, 0.28)
-          );
-          box-shadow: inset 0 1px rgba(255, 255, 255, 0.16);
+          background: rgba(122, 162, 247, 0.28);
+          box-shadow: none;
       }
 
       #workspaces button.empty:not(.active) {

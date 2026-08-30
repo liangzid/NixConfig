@@ -3,7 +3,7 @@
 #
 # 1. 提供与 Tokyo Night 桌面统一、清晰且有层次的终端外观。
 # 2. 调用链：Home Manager → ~/.config/ghostty/config → Ghostty。
-# 3. 修改历史：2026-08-30 增加透明单元格、均衡留白和统一窗口配色。
+# 3. 修改历史：2026-08-30 提高透明度；Hyprland 侧禁用 Ghostty blur。
 #
 #     Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
 #     Copyright © 2026, Zi Liang, all rights reserved.
@@ -14,8 +14,8 @@ theme = TokyoNight
 
 term = xterm-256color
 
-# REVIEW: 0.76 保留明显的壁纸透出，同时避免文字区域过度发灰。
-background-opacity = 0.76
+# REVIEW: 0.35 让壁纸高度可见；终端 blur 由 Hyprland 对 Ghostty 禁用。
+background-opacity = 0.35
 background-opacity-cells = true
 
 font-family = FiraCode Nerd Font
