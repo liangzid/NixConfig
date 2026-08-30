@@ -3,7 +3,6 @@ set -euo pipefail
 
 REPO_URL="https://github.com/liangzid/nix-config.git"
 CONFIG_DIR="/home/zi/code/NixConfig"
-# path: 包含本机未跟踪的 hardware-configuration.nix；ATTR 不要带 ".#"。
 FLAKE_ATTR="nixos"
 
 print_usage() {
@@ -14,20 +13,11 @@ print_usage() {
 
 cmd_apply() {
   echo "==> Applying NixOS configuration..."
-
-  if [ -f "$CONFIG_DIR/flake.nix" ]; then
-    if [ ! -f "$CONFIG_DIR/hosts/nixos/hardware-configuration.nix" ]; then
-      echo "Error: missing local hosts/nixos/hardware-configuration.nix" >&2
-      echo "Generate it with: sudo nixos-generate-config --show-hardware-config" >&2
-      exit 1
-    fi
-    sudo nixos-rebuild switch --flake "path:$CONFIG_DIR#$FLAKE_ATTR"
-  else
+  if [ ! -f "$CONFIG_DIR/flake.nix" ]; then
     echo "Error: flake.nix not found at $CONFIG_DIR"
-    echo "Clone the repo first or set CONFIG_DIR correctly."
     exit 1
   fi
-
+  "$CONFIG_DIR/scripts/nixos-rebuild-local.sh" switch
   echo "==> Done. Reboot recommended if kernel or bootloader changed."
 }
 
@@ -42,7 +32,6 @@ cmd_install() {
     exit 1
   fi
 
-  # Generate hardware config for target machine (local only — never commit).
   nixos-generate-config --root /mnt
 
   TARGET_DIR="${CONFIG_DIR/#\/home\/zi/\/mnt\/home\/zi}"
@@ -53,11 +42,12 @@ cmd_install() {
   HW_GENERATED="/mnt/etc/nixos/hardware-configuration.nix"
   HW_TARGET="$TARGET_DIR/hosts/nixos/hardware-configuration.nix"
   cp "$HW_GENERATED" "$HW_TARGET"
-
   echo "==> Wrote local hardware-configuration.nix (gitignored; not committed)."
 
-  # path: so the untracked hardware file is part of the flake tree.
-  nixos-install --flake "path:$TARGET_DIR#$FLAKE_ATTR"
+  # Installer tree may not have scripts yet until clone finishes — use same force-add trick.
+  git -C "$TARGET_DIR" add -f "$HW_TARGET"
+  nixos-install --flake "$TARGET_DIR#$FLAKE_ATTR"
+  git -C "$TARGET_DIR" restore --staged "$HW_TARGET" 2>/dev/null || true
 
   echo "==> Installation complete! Reboot and enjoy."
   echo "    After reboot, the config will be at ${TARGET_DIR#/mnt}."

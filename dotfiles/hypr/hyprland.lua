@@ -57,11 +57,10 @@ hl.layer_rule({ match = { namespace = "waybar" }, blur = true, ignore_alpha = 0.
 hl.layer_rule({ match = { namespace = "wofi" },   blur = true, ignore_alpha = 0.5 })
 hl.layer_rule({ match = { namespace = "dunst" },  blur = true, ignore_alpha = 0.5 })
 
---------------------
+----------------------
 ---- WINDOW RULES ----
---------------------
--- 终端不参与 blur，保持清晰可读
-hl.window_rule({ match = { class = "^com\\.mitchellh\\.ghostty$" }, no_blur = true })
+----------------------
+-- REVIEW: Ghostty 不再禁用全局 blur；透明背景由 Hyprland 统一模糊。
 
 -- 聚焦窗口强调：边框加粗 + 高亮渐变（替代原来的 dim 变暗效果）
 hl.window_rule({ match = { focus = true }, border_size = 3 })
