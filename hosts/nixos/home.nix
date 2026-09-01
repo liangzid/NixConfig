@@ -14,7 +14,6 @@
 
   home.packages = with pkgs; [
     wofi
-    waybar
     dunst
     libnotify
 

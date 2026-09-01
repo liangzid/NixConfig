@@ -1,10 +1,34 @@
+# ======================================================================
+# GHOSTTY
+#
+# 1. 提供与 Tokyo Night 桌面统一、清晰且有层次的终端外观。
+# 2. 调用链：Home Manager → ~/.config/ghostty/config → Ghostty。
+# 3. 修改历史：2026-08-30 提高透明度；Hyprland 侧禁用 Ghostty blur。
+#
+#     Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
+#     Copyright © 2026, Zi Liang, all rights reserved.
+#     Created: 30 August 2026
+# ======================================================================
+
 theme = TokyoNight
 
 term = xterm-256color
-background-opacity = 0.8
+
+# REVIEW: 0.35 让壁纸高度可见；终端 blur 由 Hyprland 对 Ghostty 禁用。
+background-opacity = 0.35
+background-opacity-cells = true
 
 font-family = FiraCode Nerd Font
 font-size = 11
+
+# 四周留白与余数均衡能消除字符紧贴窗口边缘的廉价感。
+window-padding-x = 12
+window-padding-y = 10
+window-padding-balance = true
+window-padding-color = background
+
+# 让 GTK 标题栏和标签区域继承 Tokyo Night 前景/背景色。
+window-theme = ghostty
 
 # ── Emacs-style (C-x prefix) ──
 #keybind = ctrl+x>2=new_split:down

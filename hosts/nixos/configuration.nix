@@ -131,10 +131,9 @@
 
   environment.shellAliases = {
     enw = "emacs -nw";
-    # path: 让 gitignored 的 hardware-configuration.nix 仍进入求值；
-    # 纯 git+file 只会看见已跟踪文件，容易误用云端/缺文件。
-    update = "sudo nixos-rebuild switch --flake path:$HOME/code/NixConfig#nixos";
-    upgrade = "cd $HOME/code/NixConfig && nix --extra-experimental-features 'nix-command flakes' flake update && sudo nixos-rebuild switch --flake path:$HOME/code/NixConfig#nixos";
+    # flake 看不见 gitignore 文件：脚本会临时 git add -f，rebuild 后再 unstage。
+    update = "$HOME/code/NixConfig/scripts/nixos-rebuild-local.sh switch";
+    upgrade = "cd $HOME/code/NixConfig && nix --extra-experimental-features 'nix-command flakes' flake update && $HOME/code/NixConfig/scripts/nixos-rebuild-local.sh switch";
     latexmain = "latexmk --pdflatex main.tex";
     gui = "start-hyprland";
     ec = "emacsclient";

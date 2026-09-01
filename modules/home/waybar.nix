@@ -1,13 +1,44 @@
-{ config, pkgs, ... }: {
+# ======================================================================
+# WAYBAR
+#
+# 1. 提供 Hyprland 顶栏、工作区导航和系统状态组件。
+# 2. 调用链：Home Manager → patched Waybar → Hyprland Lua IPC。
+# 3. 修改历史：2026-08-30 修复 Lua 工作区点击；工作区按钮改为直角风格。
+#
+#     Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
+#     Copyright © 2026, Zi Liang, all rights reserved.
+#     Created: 30 August 2026
+# ======================================================================
+
+{ config, pkgs, ... }:
+
+let
+  # REVIEW: Waybar 0.15 尚未支持 Hyprland 0.56 的 Lua workspace dispatch。
+  waybarWithHyprlandLuaWorkspaceClick = pkgs.waybar.overrideAttrs (oldAttrs: {
+    patches = (oldAttrs.patches or [ ]) ++ [
+      ../../patches/waybar-hyprland-lua-workspace-click.patch
+    ];
+  });
+in
+{
   programs.waybar = {
     enable = true;
+    package = waybarWithHyprlandLuaWorkspaceClick;
     settings = [{
       layer = "top";
       position = "top";
-      height = 30;
-      modules-left = [ "hyprland/workspaces" "hyprland/mode" ];
+      height = 40;
+      margin-top = 6;
+      margin-left = 8;
+      margin-right = 8;
+      modules-left = [ "hyprland/workspaces" ];
       modules-center = [ "hyprland/window" ];
-      modules-right = [ "network" "cpu" "memory" "pulseaudio" "clock" "clock#date" "tray" ];
+      modules-right = [ "network" "group/resources" "pulseaudio" "clock" "tray" ];
+
+      "group/resources" = {
+        orientation = "inherit";
+        modules = [ "cpu" "memory" ];
+      };
 
       "cpu" = {
         format = "  {usage}%";
@@ -15,15 +46,15 @@
       };
 
       "memory" = {
-        format = "  {used:0.1f}G";
+        format = "  {percentage}%";
         interval = 30;
       };
 
       "network" = {
-        format-wifi = "  {essid}";
-        format-ethernet = "󰈀  {ifname}";
-        format-disconnected = "󰖪  Disconnected";
-        tooltip-format = "{ipaddr}/{cidr}";
+        format-wifi = "󰤨  {signalStrength}%";
+        format-ethernet = "󰈀  wired";
+        format-disconnected = "󰤭  offline";
+        tooltip-format = "{ifname}\n{ipaddr}/{cidr}";
       };
 
       "pulseaudio" = {
@@ -37,16 +68,10 @@
       };
 
       "clock" = {
-        interval = 1;
-        format = "  {:%H:%M:%S}";
-        tooltip-format = "{:%Y-%m-%d %A}";
-      };
-
-      # 与 clock 拆开：悬停月历，滚轮翻月，左键打开 gnome-calendar，右键切年/月视图。
-      "clock#date" = {
         interval = 60;
-        format = "󰃭  {:%Y-%m-%d %a}";
-        tooltip-format = "<tt>{calendar}</tt>";
+        format = "  {:%H:%M}";
+        format-alt = "󰃭  {:%a · %d %b}";
+        tooltip-format = "<span size='large'><b>{:%A, %d %B %Y}</b></span>\n<tt>{calendar}</tt>";
         calendar = {
           mode = "month";
           weeks-pos = "right";
@@ -75,6 +100,11 @@
       "hyprland/workspaces" = {
         disable-scroll = true;
         all-outputs = true;
+        sort-by = "number";
+        format = "{id}";
+        persistent-workspaces = {
+          "*" = 10;
+        };
       };
     }];
     style = ''
@@ -85,59 +115,108 @@
           border-radius: 0;
           min-height: 0;
       }
+
       window#waybar {
           background: transparent;
-          border: none;
-          color: #c0caf5;
-      }
-      #workspaces {
-          margin: 6px 4px;
-          padding: 2px 4px;
-          background: rgba(26, 27, 38, 0.55);
-          border: 1px solid rgba(122, 162, 247, 0.35);
-          border-radius: 10px;
-      }
-      #workspaces button {
-          padding: 0 8px;
-          color: #7aa2f7;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-      }
-      #workspaces button.active {
-          background: linear-gradient(135deg, #7aa2f7, #bb9af7);
-          color: #1a1b26;
-      }
-      #workspaces button:hover {
-          color: #7dcfff;
-          background: rgba(122, 162, 247, 0.2);
-      }
-      #window {
-          margin: 6px 4px;
-          padding: 0 12px;
-          background: rgba(26, 27, 38, 0.55);
-          border: 1px solid rgba(122, 162, 247, 0.35);
-          border-radius: 10px;
           color: #c0caf5;
       }
 
-      #cpu, #memory, #network, #pulseaudio, #clock, #tray {
-          margin: 6px 2px;
-          padding: 0 12px;
-          background: rgba(26, 27, 38, 0.55);
-          border: 1px solid rgba(122, 162, 247, 0.35);
-          border-radius: 10px;
+      /* REVIEW: 所有胶囊共用同一玻璃材质；区别只由强调色表达。 */
+      #workspaces,
+      #window,
+      #network,
+      #resources,
+      #pulseaudio,
+      #clock,
+      #tray {
+          margin: 3px 3px;
+          background-image: linear-gradient(
+              135deg,
+              rgba(36, 40, 59, 0.82),
+              rgba(26, 27, 38, 0.68)
+          );
+          border: 1px solid rgba(192, 202, 245, 0.18);
+          border-radius: 14px;
+          box-shadow:
+              inset 0 1px rgba(255, 255, 255, 0.08),
+              0 4px 12px rgba(0, 0, 0, 0.28);
       }
-      #cpu { color: #7aa2f7; }
+
+      #workspaces {
+          padding: 3px 4px;
+      }
+
+      #workspaces button {
+          margin: 1px 2px;
+          padding: 0 9px;
+          color: rgba(192, 202, 245, 0.72);
+          background: transparent;
+          border-radius: 0;
+          transition: all 0.2s ease;
+      }
+
+      #workspaces button.active {
+          background: rgba(122, 162, 247, 0.88);
+          color: #1a1b26;
+          box-shadow: none;
+      }
+
+      #workspaces button:hover {
+          color: #ffffff;
+          background: rgba(122, 162, 247, 0.28);
+          box-shadow: none;
+      }
+
+      #workspaces button.empty:not(.active) {
+          color: rgba(86, 95, 137, 0.78);
+      }
+
+      #window {
+          padding: 0 16px;
+          color: #c0caf5;
+      }
+
+      #network,
+      #pulseaudio,
+      #clock {
+          padding: 0 13px;
+      }
+
+      #resources {
+          padding: 0 5px;
+      }
+
+      #cpu,
+      #memory {
+          padding: 0 8px;
+          background: transparent;
+      }
+
+      #cpu { color: #7dcfff; }
       #memory { color: #bb9af7; }
       #network { color: #7dcfff; }
       #pulseaudio { color: #9ece6a; }
       #clock { color: #c0caf5; }
-      #tray { padding: 0 8px; }
-      tooltip {
-          background-color: #1a1b26;
-          border: 1px solid #3b4261;
-          border-radius: 8px;
+      #tray { padding: 0 10px; }
+
+      #network:hover,
+      #resources:hover,
+      #pulseaudio:hover,
+      #clock:hover {
+          border-color: rgba(125, 207, 255, 0.55);
+          box-shadow:
+              inset 0 1px rgba(255, 255, 255, 0.12),
+              0 0 12px rgba(122, 162, 247, 0.30);
       }
+
+      tooltip {
+          padding: 10px;
+          background-image: linear-gradient(135deg, #24283b, #1a1b26);
+          border: 1px solid rgba(122, 162, 247, 0.55);
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      }
+
       tooltip label {
           color: #c0caf5;
       }
