@@ -298,6 +298,17 @@
         User = "zi";
         ProxyJump = "is1";
       };
+
+      cityu = {
+        HostName = "gateway.cs.cityu.edu.hk";
+        User = "meiliu";
+      };
+      cs8000b = {
+        HostName = "cs8000b.cs.cityu.edu.hk";
+        User = "hzli";
+        ProxyJump = "cityu";
+      };
+
       moreoverai = {
         HostName = "139.59.220.113";
         User = "ronghua";
