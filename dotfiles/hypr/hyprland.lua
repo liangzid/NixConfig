@@ -30,9 +30,13 @@ local lock_cmd = "swaylock -f -S --effect-blur 7x5 --effect-vignette 0.3:0.4"
 --------------------
 ---- AUTOSTART ----
 --------------------
--- 关键：同步环境变量到 dbus 和 systemd，解决 GTK 软件启动慢或权限问题
+-- 关键：同步环境变量到 dbus 和 systemd，解决 GTK 软件启动慢或权限问题。
+-- 随后启动 hyprland-session.target → graphical-session.target，供
+-- xdg-desktop-portal >= 1.22 的 Requisite=graphical-session.target 使用。
+-- （NixOS programs.hyprland.systemd 默认会做这两步，但自定义 lua 需手动补上。）
 hl.on("hyprland.start", function()
-    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP GDK_BACKEND XDG_SESSION_TYPE LIBVA_DRIVER_NAME GBM_BACKEND __GLX_VENDOR_LIBRARY_NAME")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP GDK_BACKEND XDG_SESSION_TYPE LIBVA_DRIVER_NAME GBM_BACKEND __GLX_VENDOR_LIBRARY_NAME HYPRLAND_INSTANCE_SIGNATURE")
+    hl.exec_cmd("systemctl --user stop hyprland-session.target; systemctl --user start hyprland-session.target")
     hl.exec_cmd("waybar")
     hl.exec_cmd("dunst")
     hl.exec_cmd("udiskie -t")
@@ -61,7 +65,7 @@ hl.layer_rule({ match = { namespace = "dunst" },  blur = true, ignore_alpha = 0.
 ---- WINDOW RULES ----
 ----------------------
 -- 终端保持清晰可读：透明背景直接透出壁纸，不走 compositor blur。
-hl.window_rule({ match = { class = "com.mitchellh.ghostty" }, no_blur = true })
+-- hl.window_rule({ match = { class = "com.mitchellh.ghostty" }, no_blur = true })
 
 -- 聚焦窗口仅略加粗边框，不再使用渐变高亮。
 hl.window_rule({ match = { focus = true }, border_size = 2 })
@@ -94,7 +98,7 @@ hl.config({
 
         blur = {
             enabled           = true,
-            size              = 6,
+            size              = 3,
             passes            = 3,
             vibrancy          = 0.2,
             new_optimizations = true,

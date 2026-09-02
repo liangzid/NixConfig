@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# 阻止把本机 hardware-configuration.nix 提交进仓库。
+if git diff --cached --name-only | grep -qx 'hosts/nixos/hardware-configuration.nix'; then
+  echo "拒绝提交 hosts/nixos/hardware-configuration.nix（本机盘符，禁止进 git）。" >&2
+  echo "请: git restore --staged hosts/nixos/hardware-configuration.nix" >&2
+  exit 1
+fi
