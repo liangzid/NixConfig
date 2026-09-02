@@ -280,6 +280,43 @@
         User = "zi";
         ProxyJump = "is1";
       };
+      gs17 = {
+        HostName = "gs17.astaple.com";
+        User = "zi";
+      };
+      gs18 = {
+        HostName = "gs18.astaple.com";
+        User = "zi";
+      };
+      gs19 = {
+        HostName = "gs19.astaple.com";
+        User = "zi";
+      };
+      gs20 = {
+        HostName = "gs20.astaple.com";
+        User = "zi";
+      };
+      gs17o = {
+        HostName = "gs17.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
+      };
+      gs18o = {
+        HostName = "gs18.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
+      };
+      gs19o = {
+        HostName = "gs19.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
+      };
+      gs20o = {
+        HostName = "gs20.astaple.com";
+        User = "zi";
+        ProxyJump = "is1";
+      };
+
       cs1 = {
         HostName = "cs1.astaple.com";
         User = "zi";
@@ -301,7 +338,7 @@
 
       cityu = {
         HostName = "gateway.cs.cityu.edu.hk";
-        User = "meiliu";
+        User = "zixuatang6";
       };
       cs8000b = {
         HostName = "cs8000b.cs.cityu.edu.hk";
