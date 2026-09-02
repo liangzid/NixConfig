@@ -12,6 +12,8 @@
     ../../modules/system/kanata.nix
   ];
 
+  hardware.uinput.enable = true;
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -217,6 +219,7 @@
   environment.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";
   };
+
 
   system.stateVersion = "26.05";
 }
