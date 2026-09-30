@@ -44,6 +44,9 @@
         HandlePowerKey = "ignore";
         HandleSuspendKey = "ignore";
         HandleHibernateKey = "ignore";
+        # 合盖挂起（suspend-to-RAM）：风扇停转、屏幕熄灭、开盖即唤醒恢复。
+        # zramSwap 足够，无需磁盘 swap；休眠到磁盘（hibernate）才需要。
+        HandleLidSwitch = "suspend";
     };
   };
 
@@ -186,7 +189,6 @@
     wpsoffice
     corefonts
     vista-fonts
-    clash-verge-rev
     udiskie
     system-config-printer
 
@@ -199,6 +201,16 @@
 
   programs.nm-applet.enable = true;
   programs.dconf.enable = true;
+  # TUN 模式声明式预配：clash-verge GUI 内置的“安装服务”流程要往只读路径
+  # 写文件，在 NixOS 上必然失败。改由官方模块开机即起 clash-verge-service
+  # （serviceMode，TUN 特权的真正来源，内核由 root 服务拉起），GUI 检测到
+  # /run/clash-verge-rev/service.sock 后即可直接打开 TUN 开关；tunMode 负责
+  # 把 rp_filter 设为 loose（TUN 下 strict 会丢回程包）并给 GUI 加 capabilities。
+  programs.clash-verge = {
+    enable = true;
+    tunMode = true;
+    serviceMode = true;
+  };
   # 禁用 systemd-ssh-proxy 的系统 Include：NixOS 生成的 /etc/ssh/ssh_config
   # 会 Include systemd 包里的 store 文件（属主 nobody），OpenSSH 10.4 的
   # 属主检查直接拒绝（Bad owner or permissions），导致所有 ssh 命令失败。
