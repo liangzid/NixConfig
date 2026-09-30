@@ -4,6 +4,8 @@
 # 1. 提供 Hyprland 顶栏、工作区导航和系统状态组件。
 # 2. 调用链：Home Manager → patched Waybar → Hyprland Lua IPC。
 # 3. 修改历史：2026-08-30 修复 Lua 工作区点击；工作区按钮改为直角风格。
+#              2026-09-27 新增显示器组件（tooltip 详情 + nwg-displays 入口）
+#              与电池组件。
 #
 #     Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
 #     Copyright © 2026, Zi Liang, all rights reserved.
@@ -19,8 +21,34 @@ let
       ../../patches/waybar-hyprland-lua-workspace-click.patch
     ];
   });
+
+  # 显示器组件的信息脚本：从 hyprctl 取所有显示器的分辨率/位置/缩放，
+  # 输出 waybar custom 模块约定的 JSON（text 显示各屏分辨率，tooltip
+  # 显示完整细节）。hyprctl 用 PATH 上的（仅在 Hyprland 会话内有意义），
+  # jq 用 store 全路径（系统 PATH 不保证有）。
+  displaysInfo = pkgs.writeShellScript "waybar-displays-info.sh" ''
+    MONITORS=$(hyprctl -j monitors 2>/dev/null) || {
+      echo '{"text": "󰍺 ?", "tooltip": "hyprctl 不可用"}'
+      exit 0
+    }
+    echo "$MONITORS" | ${pkgs.jq}/bin/jq -c '
+      {
+        text: ("󰍺 " + ([.[] | "\(.width)×\(.height)"] | join(" + "))),
+        tooltip: (
+          ([.[] |
+            "\(.name)  \(.width)×\(.height)@\(.refreshRate * 10 | round / 10)Hz  位置 \(.x),\(.y)  缩放 \(.scale)" +
+            (if .focused then "  ● 焦点" else "" end) +
+            (if .dpmsStatus == false then "  [休眠]" else "" end)
+          ] | join("\n")) + "\n\n左键打开 nwg-displays 细调配置"
+        )
+      }'
+    # 注：不使用 hyprctl 的 disabled 字段——0.56 的 JSON 里它对点亮中的
+    # 屏幕也误报 true（疑似 Lua 迁移期序列化问题），语义不可靠。
+  '';
 in
 {
+  home.packages = [ pkgs.nwg-displays ];
+
   programs.waybar = {
     enable = true;
     package = waybarWithHyprlandLuaWorkspaceClick;
@@ -33,7 +61,7 @@ in
       margin-right = 8;
       modules-left = [ "hyprland/workspaces" ];
       modules-center = [ "hyprland/window" ];
-      modules-right = [ "network" "group/resources" "pulseaudio" "clock" "tray" ];
+      modules-right = [ "network" "group/resources" "pulseaudio" "battery" "custom/displays" "clock" "tray" ];
 
       "group/resources" = {
         orientation = "inherit";
@@ -59,11 +87,37 @@ in
 
       "pulseaudio" = {
         format = "{icon} {volume}%";
-        format-muted = "  muted";
+        format-muted = "  muted";
         format-icons.default = [ "" "" "" ];
         on-click = "pavucontrol";
         on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
         scroll-step = 5;
+        tooltip = true;
+      };
+
+      # REVIEW: 电量组件阈值（warning 30% / critical 15%）可按习惯调整。
+      # 无电池的机器上 waybar 自动隐藏本模块，配置可跨机器复用。
+      "battery" = {
+        interval = 30;
+        states = {
+          warning = 30;
+          critical = 15;
+        };
+        format = "{icon} {capacity}%";
+        format-charging = "󰂄 {capacity}%";
+        format-plugged = "󰚥 {capacity}%";
+        format-icons = [ "󰁺" "󰁼" "󰁾" "󰁿" "󰂀" "󰂂" ];
+        tooltip-format = "{timeTo}";
+      };
+
+      # 显示器组件：text 显示各屏分辨率，tooltip 显示名称/分辨率@刷新率/
+      # 位置坐标/缩放/焦点状态；左键打开 nwg-displays 做持久化细调。
+      "custom/displays" = {
+        format = "{}";
+        return-type = "json";
+        interval = 10;
+        exec = "${displaysInfo}";
+        on-click = "${pkgs.nwg-displays}/bin/nwg-displays";
         tooltip = true;
       };
 
@@ -127,6 +181,8 @@ in
       #network,
       #resources,
       #pulseaudio,
+      #battery,
+      #custom-displays,
       #clock,
       #tray {
           margin: 3px 3px;
@@ -178,6 +234,8 @@ in
 
       #network,
       #pulseaudio,
+      #battery,
+      #custom-displays,
       #clock {
           padding: 0 13px;
       }
@@ -196,12 +254,19 @@ in
       #memory { color: #bb9af7; }
       #network { color: #7dcfff; }
       #pulseaudio { color: #9ece6a; }
+      #battery { color: #9ece6a; }
+      /* REVIEW: 电量状态色（正常绿/警告橙/危急红），充电时保持绿色。 */
+      #battery.warning:not(.charging) { color: #e0af68; }
+      #battery.critical:not(.charging) { color: #f7768e; }
+      #custom-displays { color: #e0af68; }
       #clock { color: #c0caf5; }
       #tray { padding: 0 10px; }
 
       #network:hover,
       #resources:hover,
       #pulseaudio:hover,
+      #battery:hover,
+      #custom-displays:hover,
       #clock:hover {
           border-color: rgba(125, 207, 255, 0.55);
           box-shadow:

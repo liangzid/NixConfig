@@ -11,6 +11,12 @@ hl.monitor({
     scale    = 1.5,
 })
 
+-- REVIEW: nwg-displays 持久化挂载点。GUI 里保存的显示器配置会写入
+-- ~/.config/hypr/monitors.lua（官方对 Hyprland 0.55+ Lua 配置的约定）。
+-- 首次保存前该文件不存在，pcall 静默跳过；与上面的通配规则并存，
+-- Hyprland 取更具体的 monitor 规则，不冲突。
+pcall(require, "monitors")
+
 --------------------
 ---- ENVIRONMENT ----
 --------------------
