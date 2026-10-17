@@ -21,6 +21,31 @@
   outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+
+    # KEYPOINT (review): youwen5 sources.json for 1.23.3b is stale.
+    # GitHub re-uploaded zen.linux-x86_64.tar.xz after the flake hashed it.
+    # specified: sha256-d9cHicsaxIhxd0FpzxdQdy6J62cfSiWHJO9F1pyIbxU=
+    # actual:    sha256-uyBF0+IWVNQP6EElAJLurf0sH8gx7vtQkiJ3PIvcoUk=  (prefetch 2026-10-17)
+    # Drop this overlay and use the flake's default package once upstream matches.
+    zenBrowserTarballHash = "sha256-uyBF0+IWVNQP6EElAJLurf0sH8gx7vtQkiJ3PIvcoUk=";
+
+    zenBrowserOverlay = final: prev: let
+      unwrapped = zen-browser.packages.${system}.zen-browser-unwrapped.overrideAttrs (old: {
+        src = prev.fetchurl {
+          url = old.src.url or (builtins.head old.src.urls);
+          hash = zenBrowserTarballHash;
+        };
+      });
+    in {
+      # Re-wrap after the src fix; wrapFirefox closes over unwrapped at call time.
+      # Same firefoxVersion trick as youwen5/zen-browser.nix so FFmpeg ABI matches.
+      zen-browser = prev.wrapFirefox (unwrapped // {
+        version = unwrapped.firefoxVersion;
+      }) {
+        pname = "zen-browser";
+        version = unwrapped.version;
+      };
+    };
   in {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       inherit system;
@@ -30,9 +55,7 @@
           nixpkgs.overlays = [
             llm-agents.overlays.shared-nixpkgs
             grok-bot.overlays.default
-            (final: prev: {
-              zen-browser = zen-browser.packages.${system}.default;
-            })
+            zenBrowserOverlay
           ];
         }
 
