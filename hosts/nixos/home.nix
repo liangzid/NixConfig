@@ -104,6 +104,10 @@
     kdePackages.kdenlive
 
     google-chrome
+    (vivaldi.override {
+      proprietaryCodecs = true;
+      enableWidevine = true;
+    })
 
     # Terminal
     ghostty

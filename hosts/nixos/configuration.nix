@@ -127,6 +127,8 @@
     "corefonts"
     "vista-fonts"
     "google-chrome"
+    "vivaldi"
+    "widevine-cdm"
     "telegram-desktop"
     "grok-bot"
   ];
