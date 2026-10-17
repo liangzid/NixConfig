@@ -6,7 +6,8 @@
 #   cp /etc/nixos/hardware-configuration.nix hosts/nixos/hardware-configuration.nix
 #
 # Real disk UUIDs must NEVER be committed: this repo is multi-machine.
-# Flake builds use path:… so the local (gitignored) file is still visible.
+# Flakes only see git-tracked/staged files — use scripts/nixos-rebuild-local.sh
+# (temporary git add -f, then unstage) so the local file applies without committing.
 { config, lib, pkgs, modulesPath, ... }:
 
 {
