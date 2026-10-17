@@ -356,9 +356,10 @@
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
-      "text/html" = ["firefox.desktop"];
-      "x-scheme-handler/http" = ["firefox.desktop"];
-      "x-scheme-handler/https" = ["firefox.desktop"];
+      # KEYPOINT (review): wrapFirefox launcherName = binaryName = zen → zen.desktop
+      "text/html" = ["zen.desktop"];
+      "x-scheme-handler/http" = ["zen.desktop"];
+      "x-scheme-handler/https" = ["zen.desktop"];
       "application/pdf" = ["org.kde.okular.desktop"];
       "image/png" = ["imv.desktop"];
       "image/jpeg" = ["imv.desktop"];

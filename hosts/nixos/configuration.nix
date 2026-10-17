@@ -10,6 +10,7 @@
     ../../modules/system/pipewire.nix
     ../../modules/system/portal.nix
     ../../modules/system/kanata.nix
+    ../../modules/system/zen-browser.nix
   ];
 
   hardware.uinput.enable = true;

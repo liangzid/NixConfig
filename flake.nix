@@ -12,9 +12,13 @@
       url = "github:jordangarrison/grok-bot-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
   in {
@@ -26,6 +30,9 @@
           nixpkgs.overlays = [
             llm-agents.overlays.shared-nixpkgs
             grok-bot.overlays.default
+            (final: prev: {
+              zen-browser = zen-browser.packages.${system}.default;
+            })
           ];
         }
 

@@ -192,7 +192,7 @@ hl.bind(main_mod .. " + down",  hl.dsp.focus({ direction = "down" }))
 hl.bind(main_mod .. " + Tab",   hl.dsp.window.cycle_next())
 
 -- K for kill window, V for floating, F for Fullscreen (and back),
--- T for terminal, X for menu (like emacs), E for Explorer
+-- T for terminal, X for menu (like emacs), E for Explorer, B for Browser
 hl.bind(main_mod .. " + K", hl.dsp.window.close())
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 -- Super+V 仍是浮动；历史剪贴板用 Super+Shift+V，避免抢键。
@@ -202,6 +202,7 @@ hl.bind("CTRL + ALT + T",   hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + X", hl.dsp.exec_cmd(menu))
 hl.bind(main_mod .. " + E", hl.dsp.exec_cmd("nautilus"))
+hl.bind(main_mod .. " + B", hl.dsp.exec_cmd("zen"))
 
 -- Q for quit.
 hl.bind(main_mod .. " + Q", hl.dsp.exec_cmd(
