@@ -196,9 +196,16 @@
     nautilus
     nautilus-python
     gnome-disk-utility
+    caligula
     loupe
     adwaita-icon-theme
   ];
+
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+  programs.thunderbird.enable = true;
 
   programs.nm-applet.enable = true;
   programs.dconf.enable = true;
