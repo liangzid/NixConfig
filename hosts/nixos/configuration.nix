@@ -127,6 +127,7 @@
     "vista-fonts"
     "google-chrome"
     "telegram-desktop"
+    "grok-bot"
   ];
 
   environment.shellAliases = {
@@ -162,6 +163,7 @@
     llm-agents.reasonix
     llm-agents.hermes-desktop
     llm-agents.agent-browser
+    grok-bot
     pi-coding-agent
     nodejs
     firefox

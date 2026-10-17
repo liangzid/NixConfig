@@ -76,7 +76,7 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agents         | pi-coding-agent, llm-agents (claw-code, code, codex, crush, omp, opencode, reasonix, hermes-desktop, agent-browser) |
+| Agents         | pi-coding-agent, grok-bot, llm-agents (claw-code, code, codex, crush, omp, opencode, reasonix, hermes-desktop, agent-browser) |
 | VPN/Proxy      | clash-verge-rev               |
 |----------------+-------------------------------|
 
@@ -115,6 +115,7 @@ declared in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 + =llm-agents.omp= — Oh My Pi coding agent
 + =llm-agents.hermes-desktop= — desktop UI agent
 + =llm-agents.agent-browser= — browser-driven agent
++ =grok-bot= — xAI desktop agent, from [[https://github.com/jordangarrison/grok-bot-flake][jordangarrison/grok-bot-flake]] (repackaged =.deb=)
 
 Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) is updated via the NixOS flake update cycle (=upgrade= alias),
 not through =pi update=. The environment variable =PI_OFFLINE=1= is set in

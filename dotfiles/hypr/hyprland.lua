@@ -24,6 +24,8 @@ hl.env("LIBVA_DRIVER_NAME", "nvidia")
 hl.env("GBM_BACKEND", "nvidia-drm")
 hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 hl.env("WLR_NO_HARDWARE_CURSORS", "1")
+-- Electron（Grok Bot / Chrome / VS Code 等）走 Wayland，而不是默认 XWayland。
+hl.env("NIXOS_OZONE_WL", "1")
 
 local lock_cmd = "swaylock -f -S --effect-blur 7x5 --effect-vignette 0.3:0.4"
 

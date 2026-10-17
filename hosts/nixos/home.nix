@@ -373,6 +373,8 @@
       "text/x-csrc" = ["emacsclient.desktop"];
       "text/x-shellscript" = ["emacsclient.desktop"];
       "inode/directory" = ["org.gnome.Nautilus.desktop"];
+      # Grok Bot 登录回流用 sand://（见 jordangarrison/grok-bot-flake）。
+      "x-scheme-handler/sand" = ["grok-bot.desktop"];
     };
   };
 

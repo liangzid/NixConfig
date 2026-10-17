@@ -8,9 +8,13 @@
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland.inputs.nixpkgs.follows = "nixpkgs";
     llm-agents.url = "github:numtide/llm-agents.nix";
+    grok-bot = {
+      url = "github:jordangarrison/grok-bot-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
   in {
@@ -21,6 +25,7 @@
         {
           nixpkgs.overlays = [
             llm-agents.overlays.shared-nixpkgs
+            grok-bot.overlays.default
           ];
         }
 

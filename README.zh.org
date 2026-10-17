@@ -67,7 +67,7 @@ Nix/NixOS 的核心理念：
 | 截图      | grim/slurp/swappy                  |
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
-| Agent     | pi-coding-agent, llm-agents（claw-code、code、codex、crush、omp、opencode、reasonix、hermes-desktop、agent-browser） |
+| Agent     | pi-coding-agent, grok-bot, llm-agents（claw-code、code、codex、crush、omp、opencode、reasonix、hermes-desktop、agent-browser） |
 | VPN/代理  | clash-verge-rev                    |
 |-----------+------------------------------------|
 
@@ -105,6 +105,7 @@ Nix/NixOS 的核心理念：
 + =llm-agents.omp= — Oh My Pi 编程助手
 + =llm-agents.hermes-desktop= — 桌面 UI 助手
 + =llm-agents.agent-browser= — 浏览器驱动的代理
++ =grok-bot= — xAI 桌面 Agent，来自 [[https://github.com/jordangarrison/grok-bot-flake][jordangarrison/grok-bot-flake]]（重打包 =.deb=）
 
 Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) 的更新通过 NixOS flake 更新周期完成（=upgrade= 别名），
 而非 =pi update=。环境变量 =PI_OFFLINE=1= 在 [[./hosts/nixos/home.nix][home.nix]] 中设置，
