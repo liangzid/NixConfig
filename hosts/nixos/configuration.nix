@@ -96,11 +96,15 @@
       "https://cache.numtide.com"
       "https://hyprland.cachix.org"
       "https://nix-community.cachix.org"
+      "https://eval-exec.cachix.org"
+      "https://nix-wpe-webkit.cachix.org"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       "hyprland.cachix.org-1:a7pgxzMz7+chwmg3VQLluhnv4v3C4Y0sYc5LmPzO2v0="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "eval-exec.cachix.org-1:xvopUI7X7+Vt1gaSsWJ0PQFPP66vs8v5iIaz6boxf64="
+      "nix-wpe-webkit.cachix.org-1:ItCjHkz1Y5QcwqI9cTGNWHzcox4EqcXqKvOygxpwYHE="
     ];
   };
 

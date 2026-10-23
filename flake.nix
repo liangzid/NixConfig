@@ -1,4 +1,17 @@
 {
+  # Root is a trusted user, so nixos-rebuild (sudo) honors this on the
+  # first switch — before configuration.nix has rewritten nix.conf.
+  nixConfig = {
+    extra-substituters = [
+      "https://eval-exec.cachix.org"
+      "https://nix-wpe-webkit.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "eval-exec.cachix.org-1:xvopUI7X7+Vt1gaSsWJ0PQFPP66vs8v5iIaz6boxf64="
+      "nix-wpe-webkit.cachix.org-1:ItCjHkz1Y5QcwqI9cTGNWHzcox4EqcXqKvOygxpwYHE="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -16,9 +29,12 @@
       url = "github:youwen5/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Do not nixpkgs.follows: crane / rust-overlay / nix-wpe-webkit are
+    # pinned to neomacs' own nixpkgs. Following ours forces a WPE rebuild.
+    neomacs.url = "github:eval-exec/neomacs";
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, neomacs, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
 
@@ -56,6 +72,12 @@
             llm-agents.overlays.shared-nixpkgs
             grok-bot.overlays.default
             zenBrowserOverlay
+            # KEYPOINT (review): splice the flake package only.
+            # neomacs.overlays.default replaces rust/wpewebkit for the
+            # whole package set; we do not want that.
+            (final: prev: {
+              neomacs = neomacs.packages.${system}.neomacs;
+            })
           ];
         }
 

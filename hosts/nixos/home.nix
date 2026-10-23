@@ -3,6 +3,7 @@
 {
   imports = [
     ../../modules/home/emacs.nix
+    ../../modules/home/neomacs.nix
     ../../modules/home/waybar.nix
     ../../modules/home/gtk.nix
     ../../modules/home/common-lisp.nix
@@ -71,6 +72,7 @@
     # Media
     imv
     mpv
+    qrencode
     termusic
     obs-studio
     vlc
