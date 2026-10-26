@@ -7,6 +7,7 @@
     ../../modules/home/waybar.nix
     ../../modules/home/gtk.nix
     ../../modules/home/common-lisp.nix
+    ../../modules/home/openclaw.nix
   ];
 
   home.username = "zi";

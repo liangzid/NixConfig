@@ -76,7 +76,7 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agents         | pi-coding-agent, grok-bot, llm-agents (claw-code, code, codex, crush, omp, opencode, reasonix, hermes-desktop, agent-browser) |
+| Agents         | pi-coding-agent, grok-bot, openclaw, llm-agents (claw-code, code, codex, crush, dsh, omp, opencode, reasonix, hermes-desktop, agent-browser) |
 | VPN/Proxy      | clash-verge-rev               |
 |----------------+-------------------------------|
 
@@ -87,7 +87,7 @@ Note: This list will keep increase and changed dynamically.
 + *Fully Declarative* — every package, service, and dotfile is described in Nix, reproducible on any machine.
 + *Minimal & Fast* — TTY by default, Hyprland on demand. No bloat.
 + *Flake-Powered* — pinned dependencies, atomic upgrades, rollbacks built-in.
- *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =omp=, =hermes-desktop=, =agent-browser=), SSH with jump hosts.
+ *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =dsh=, =omp=, =hermes-desktop=, =agent-browser=), SSH with jump hosts.
 + *Wayland Native* — no X11 legacy. Screenshots, smooth animations.
 + *Chinese-Friendly* — fcitx5 + rime, WeChat, QQ, WPS Office, CJK fonts.
 + *Gaming Support* — Steam with 32-bit libs, NVIDIA drivers.
@@ -110,6 +110,8 @@ declared in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 + =llm-agents.codex= — OpenAI Codex CLI
 + =llm-agents.reasonix= — reasoning-focused agent
 + =llm-agents.crush= — interactive coding agent
++ =llm-agents.dsh= — DeepSeek Harness (`dsh` CLI; on PATH, not a service)
++ =openclaw= — Telegram gateway via official =nix-openclaw= Home Manager module; user service at boot; model deferred
 + =llm-agents.claw-code= — Anthropic Claude Code-style agent
 + =llm-agents.code= — generic coding agent
 + =llm-agents.omp= — Oh My Pi coding agent

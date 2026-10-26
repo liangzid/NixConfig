@@ -67,7 +67,7 @@ Nix/NixOS 的核心理念：
 | 截图      | grim/slurp/swappy                  |
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
-| Agent     | pi-coding-agent, grok-bot, llm-agents（claw-code、code、codex、crush、omp、opencode、reasonix、hermes-desktop、agent-browser） |
+| Agent     | pi-coding-agent, grok-bot, openclaw, llm-agents（claw-code、code、codex、crush、dsh、omp、opencode、reasonix、hermes-desktop、agent-browser） |
 | VPN/代理  | clash-verge-rev                    |
 |-----------+------------------------------------|
 
@@ -78,7 +78,7 @@ Nix/NixOS 的核心理念：
 + *完全声明式* — 所有软件包、服务与 dotfile 均由 Nix 描述，任意机器皆可复现。
 + *轻量高效* — 默认为 TTY，按需启动 Hyprland。无冗余。
 + *Flake 驱动* — 锁定依赖版本，原子化升级，内建回滚。
-*开箱即用的开发环境* — Emacs、Ghostty、Zellij、一套精选的 LLM 编程助手 (=pi=、=opencode=、=codex=、=reasonix=、=crush=、=claw-code=、=code=、=omp=、=hermes-desktop=、=agent-browser=)、SSH 跳板机。
+*开箱即用的开发环境* — Emacs、Ghostty、Zellij、一套精选的 LLM 编程助手 (=pi=、=opencode=、=codex=、=reasonix=、=crush=、=claw-code=、=code=、=dsh=、=omp=、=hermes-desktop=、=agent-browser=)、SSH 跳板机。
 + *Wayland 原生* — 无需 X11 兼容层。截图、流畅动画。
 + *中文友好* — fcitx5 + rime，WeChat、QQ、WPS Office、CJK 字体。
 + *游戏支持* — Steam 含 32 位库，NVIDIA 驱动。
@@ -100,6 +100,8 @@ Nix/NixOS 的核心理念：
 + =llm-agents.codex= — OpenAI Codex CLI
 + =llm-agents.reasonix= — 偏推理的编程助手
 + =llm-agents.crush= — 交互式编程助手
++ =llm-agents.dsh= — DeepSeek Harness（=dsh= CLI；不常驻，按需调用）
++ =openclaw= — Telegram Gateway，官方 =nix-openclaw= Home Manager 模块；开机 user 服务；模型稍后配
 + =llm-agents.claw-code= — Claude Code 风格的代理
 + =llm-agents.code= — 通用编程助手
 + =llm-agents.omp= — Oh My Pi 编程助手

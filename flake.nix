@@ -32,9 +32,12 @@
     # Do not nixpkgs.follows: crane / rust-overlay / nix-wpe-webkit are
     # pinned to neomacs' own nixpkgs. Following ours forces a WPE rebuild.
     neomacs.url = "github:eval-exec/neomacs";
+    # Do not nixpkgs.follows: nix-openclaw pins pnpm/qmd/tool packages.
+    # Following ours would rebuild their toolchain against our nixpkgs.
+    nix-openclaw.url = "github:openclaw/nix-openclaw";
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, neomacs, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, neomacs, nix-openclaw, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
 
@@ -78,6 +81,7 @@
             (final: prev: {
               neomacs = neomacs.packages.${system}.neomacs;
             })
+            nix-openclaw.overlays.default
           ];
         }
 
@@ -90,7 +94,12 @@
           # 升级/重新激活时若文件内容冲突，先备份旧文件而不是中止激活。
           # 之前 home-manager-zi.service 反复因 ~/.ssh/config 冲突而激活失败。
           home-manager.backupFileExtension = "backup";
-          home-manager.users.zi = import ./hosts/nixos/home.nix;
+          home-manager.users.zi = {
+            imports = [
+              nix-openclaw.homeManagerModules.openclaw
+              ./hosts/nixos/home.nix
+            ];
+          };
           home-manager.extraSpecialArgs = { inherit hyprland; };
         }
       ];
