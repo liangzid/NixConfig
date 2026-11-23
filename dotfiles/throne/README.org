@@ -1,0 +1,14 @@
+* Import Throne routing profiles
+
+主窗口 =Ctrl+V= *不会*吃 JSON：那条路径只导入订阅/节点。
+必须粘贴 =throne://route/...= 深链接。
+
+1. 打开 =~/.config/Throne/route-from-nix/hk-ai-only.link=
+   （内地用 =cn-bypass.link=），复制 *整行*（以 =throne://route/= 开头）。
+2. 点一下 Throne *主窗口*，按 =Ctrl+V=。
+3. 确认 Add this routing profile。
+4. 底部 =Routing= 菜单选 =HK AI only= 或 =CN bypass=。
+5. 若已在连接，点 =Restart=。
+
+不要把 JSON 拖进 Throne，那也会被当成订阅。
+JSON 只是规则源文件；改完 JSON 后需要重新生成 =.link= 再导入一次。

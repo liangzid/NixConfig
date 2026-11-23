@@ -68,7 +68,7 @@ Nix/NixOS 的核心理念：
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
 | Agent     | pi-coding-agent, grok-bot, openclaw, llm-agents（claw-code、code、codex、crush、dsh、omp、opencode、reasonix、hermes-desktop、agent-browser） |
-| VPN/代理  | clash-verge-rev                    |
+| VPN/代理  | throne（TUN；原 NekoRay）           |
 |-----------+------------------------------------|
 
 注：此列表会持续更新。
@@ -87,7 +87,7 @@ Nix/NixOS 的核心理念：
 
 + 输入法：=fcitx5= + =rime= + =pinyin=，主题：=Material-Color-deepPurple=
 + 通讯：=wechat-uos=、=qq=
-+ VPN：=clash-verge-rev=
++ VPN：=throne=（TUN；原 NekoRay）
 
 ** Coding Agents
 
@@ -102,7 +102,8 @@ Nix/NixOS 的核心理念：
 + =llm-agents.crush= — 交互式编程助手
 + =llm-agents.dsh= — DeepSeek Harness（=dsh= CLI；不常驻，按需调用）
 + =openclaw= — Telegram Gateway，官方 =nix-openclaw= Home Manager 模块；开机 user 服务；模型稍后配
-+ =llm-agents.claw-code= — Claude Code 风格的代理
++ =claude-code= (=claude=) — nixpkgs 里的官方 Anthropic Claude Code（unfree）
++ =llm-agents.claw-code= (=claw=) — Claude Code 风格的代理，不是官方 CLI
 + =llm-agents.code= — 通用编程助手
 + =llm-agents.omp= — Oh My Pi 编程助手
 + =llm-agents.hermes-desktop= — 桌面 UI 助手
@@ -141,7 +142,8 @@ nix-config/
 │   │   ├── input-method.nix  # fcitx5 + rime + cloudpinyin + 主题
 │   │   ├── pipewire.nix      # 音频：pipewire + alsa + pulse
 │   │   ├── portal.nix        # Wayland 的 XDG 桌面门户
-│   │   └── kanata.nix        # CapsLock → Control 映射
+│   │   ├── kanata.nix        # CapsLock → Control 映射
+│   │   └── throne.nix        # Throne TUN 客户端（VLESS 节点）
 │   └── home/                 # 可复用的 home-manager 模块
 │       ├── emacs.nix         # Emacs + vterm
 │       ├── waybar.nix        # 状态栏（tokyonight 主题）
@@ -150,8 +152,7 @@ nix-config/
     ├── hypr/hyprland.lua     # Hyprland 快捷键 + 自启动
     ├── wofi/{config,style.css}
     ├── ghostty/config        # 终端（Emacs 风格快捷键 + Tokyo Night 主题）
-    ├── clash/merge-hk.yaml   # 翻墙规则（香港模式）
-    ├── clash/merge-cn.yaml   # 翻墙规则（大陆模式）
+    ├── throne/{hk-ai-only,cn-bypass}.json  # Throne Ctrl+V 导入分流
     └── fcitx5/{classicui,pinyin}.conf  # 输入法主题与行为
 #+end_src
 
@@ -426,11 +427,12 @@ flake 要求所有引用的文件被 Git 追踪。你可能新增或替换了
 较旧的 SSH 客户端不接受过大的 =ServerAliveCountMax= 值。
 在 [[./hosts/nixos/home.nix][home.nix]] 中改为 =ServerAliveCountMax 999=。
 
-** Clash / 代理重建后无法使用
+** Throne / 代理重建后无法使用
 
-=clash-verge-rev= 需要订阅链接才能工作。它已被安装但不会预先配置你的订阅。
-打开 Clash → Profiles → 添加你的订阅。然后设置 Merge 指向
-=~/.config/clash-verge-rev/= 中对应的 yaml 文件。
+=throne= 已安装并具备 TUN 权限，但不含节点。从 wofi 打开 =Throne= →
+导入 VLESS/VMess 链接或订阅 → 打开 TUN Mode。分流只在 GUI 里配
+（默认 DIRECT，仅 AI 域名走代理，域名表见 [[./modules/system/throne.nix][throne.nix]] 注释）。
+不要把订阅写进 git。
 
 ** Hyprland 无法启动（只有 TTY） / "start-hyprland" 找不到
 
@@ -482,6 +484,7 @@ fcitx5 的 Wayland 输入法前端会处理 GTK 应用
 | =Ctrl + Alt + T=       | 打开终端（备用）                 |
 | =Print=                | 区域截图 → 标注                  |
 | =Calculator=           | 区域截图 → 标注                  |
+| =Ctrl + Alt + A=       | 区域截图 → 标注                  |
 | =Ctrl + Print=         | 全屏截图 → 剪贴板                |
 | =Ctrl + Calculator=    | 全屏截图 → 剪贴板                |
 
@@ -525,16 +528,35 @@ Ghostty 使用 =tokyo-night= 主题，=background-opacity = 0.8=，且
 SSH 保活（=ServerAliveInterval 60=）防止空闲断开，
 =AddKeysToAgent yes= 将密钥密码缓存在内存中。
 
-* 翻墙（Clash Verge Rev）
+* 翻墙（Throne）
 
-已安装 [[https://github.com/clash-verge-rev/clash-verge-rev][clash-verge-rev]] 用于代理管理。
-提供两个 Merge 配置用于切换地区：
+通过 [[./modules/system/throne.nix][modules/system/throne.nix]] 安装
+[[https://github.com/throneproj/Throne][Throne]]（原 NekoRay）并打开 TUN，微信 / QQ / Steam 等不认
+=HTTP_PROXY= 的程序也可以走 VLESS/VMess 节点。
 
-- =merge-hk.yaml=：大部分流量 → DIRECT，仅 AI 服务（ChatGPT、OpenAI、
-  Anthropic）→ Proxy
-- =merge-cn.yaml=：订阅处理默认路由，额外规则处理实验室服务器和 AI 服务
+Nix 只负责安装客户端和 TUN 权限。重建后：
 
-切换方法：Profiles → 订阅 → Edit Info → Merge → 选择对应的 yaml。
+1. 从 wofi 打开 =Throne=（不自启）。
+2. 导入 VLESS/VMess 链接或订阅。不要提交到 git。
+3. 打开 TUN Mode。
+4. 导入路由 *链接*（主窗口 =Ctrl+V= 会把 JSON 当成订阅，读不了）。
+   复制 =~/.config/Throne/route-from-nix/hk-ai-only.link=（或
+   =cn-bypass.link=）里那一整行，切到 Throne 主窗口按 =Ctrl+V=。
+   再在 =Routing= 菜单选中该 profile；若已在连接就点 =Restart=。
+   步骤见 [[./dotfiles/throne/README.org][dotfiles/throne/README.org]]。
+   - =HK AI only=：默认 DIRECT，只有 OpenAI/Anthropic/Gemini agent
+     端点（及列出的后缀）走 VPS。
+   - =CN bypass=：局域网 + =*.astaple.com= + =geosite-cn= / =geoip-cn=
+     直连，其余走代理。
+
+系统时区仍是 =Asia/Hong_Kong=，会话 locale 仍是 =en_HK=。Zen、Firefox、
+Chrome、Vivaldi、=claude=、=claw= 和 =codex= 包了
+=TZ=America/Los_Angeles= 和 =LANG=en_US.UTF-8=（浏览器另加 =--lang=en-US=）。
+rebuild 后要彻底退出这些程序再开；Chrome 必须从 PATH/=wofi= 启动。
+Waybar 和 =date= 仍是香港时间。
+
+若 TUN 起来了但域名不通（=ping 8.8.8.8= 通），先看 =resolvectl status=。
+不要预先写死 =trustedInterfaces=，网卡名要实际看过再加。
 
 * 输入法
 

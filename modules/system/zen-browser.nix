@@ -8,8 +8,12 @@
 #      -> environment.systemPackages
 #    MIME defaults: hosts/nixos/home.nix
 #    Super+B:       dotfiles/hypr/hyprland.lua
+#    TZ wrap:       modules/lib/wrap-tz.nix → America/Los_Angeles
 # 3. 17 October 2026: initial setup from NixOS Wiki wrapFirefox example,
 #    but override the flake-wrapped package instead of wrapping unwrapped.
+#    18 November 2026: drop stale 1.23.3b tarball-hash overlay; 1.24.2b
+#    sources.json already matches GitHub.
+#    23 November 2026: wrap zen with TZ=America/Los_Angeles + en-US.
 #
 # Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
 # Copyright © 2026, Zi Liang, all rights reserved.
@@ -22,6 +26,8 @@
   ...
 }:
 let
+  wrapTz = import ../lib/wrap-tz.nix { inherit pkgs lib; };
+
   # AMO shortId (URL slug) + guid (from addons.mozilla.org/api/v5/addons/addon/<shortId>/).
   extension = shortId: guid: {
     name = guid;
@@ -34,6 +40,9 @@ let
   prefs = {
     "extensions.autoDisableScopes" = 0;
     "extensions.pocket.enabled" = false;
+    # Match wrap-tz US identity. Default session locale is en_HK.
+    "intl.accept_languages" = "en-US, en";
+    "intl.locale.requested" = "en-US";
   };
 
   extensions = [
@@ -87,8 +96,12 @@ let
 in
 {
   environment.systemPackages = [
-    (pkgs.zen-browser.override {
-      inherit extraPrefs extraPolicies;
+    (wrapTz {
+      pkg = pkgs.zen-browser.override {
+        inherit extraPrefs extraPolicies;
+      };
+      bins = [ "zen" ];
+      extraFlags = [ "--lang=en-US" ];
     })
   ];
 }

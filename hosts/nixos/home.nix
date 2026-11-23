@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let
+  wrapTz = import ../../modules/lib/wrap-tz.nix { inherit pkgs lib; };
+in
 {
   imports = [
     ../../modules/home/emacs.nix
@@ -106,10 +109,18 @@
     shotcut
     kdePackages.kdenlive
 
-    google-chrome
-    (vivaldi.override {
-      proprietaryCodecs = true;
-      enableWidevine = true;
+    (wrapTz {
+      pkg = google-chrome;
+      bins = [ "google-chrome" "google-chrome-stable" ];
+      extraFlags = [ "--lang=en-US" ];
+    })
+    (wrapTz {
+      pkg = vivaldi.override {
+        proprietaryCodecs = true;
+        enableWidevine = true;
+      };
+      bins = [ "vivaldi" ];
+      extraFlags = [ "--lang=en-US" ];
     })
 
     # Terminal
@@ -166,6 +177,12 @@
     force = true;
   };
 
+  home.file."scripts/test-throne-route.sh" = {
+    source = ../../dotfiles/scripts/test-throne-route.sh;
+    executable = true;
+    force = true;
+  };
+
   home.file."scripts/clipboard-hist.sh" = {
     source = ../../dotfiles/scripts/clipboard-hist.sh;
     executable = true;
@@ -187,7 +204,16 @@
 
   # OpenSSH 要求 ~/.ssh/config 属主为 root 或当前用户，而 HM 生成的
   # store 文件属主是 nobody，会被 ssh 拒绝（Bad owner or permissions）。
-  # 激活后把 config 复制成真实文件（600），保持声明式内容不变。
+  # 流程：激活前删掉上次复制出来的真实文件 → HM 写入 store 链接 →
+  # 激活后再复制成 600 真实文件。
+  # KEYPOINT (review): 不能靠 backupFileExtension=backup。config.backup
+  # 一旦存在，下次内容变化时 HM 会因 clobber 直接激活失败。
+  home.file.".ssh/config".force = true;
+  home.activation.sshConfigClearBeforeCheck = config.lib.dag.entryBefore ["checkLinkTargets"] ''
+    if [ -e "$HOME/.ssh/config" ] && [ ! -L "$HOME/.ssh/config" ]; then
+      $DRY_RUN_CMD rm -f "$HOME/.ssh/config"
+    fi
+  '';
   home.activation.sshConfigRealFile = config.lib.dag.entryAfter ["writeBoundary"] ''
     if [ -L "$HOME/.ssh/config" ]; then
       storeConfig="$(readlink "$HOME/.ssh/config")"
@@ -201,8 +227,6 @@
   programs.ssh = {
     enable = true;
     # 保持开启：HM 统一生成 ~/.ssh/config（settings 是唯一来源）。
-    # 旧的手动文件由 flake.nix 里的 home-manager.backupFileExtension
-    # 在下次激活时自动备份为 config.backup，不会中断激活。
     # matchBlocks 已弃用，改用等价的 settings（OpenSSH 原生指令名）。
     enableDefaultConfig = false;
     settings = {
@@ -357,6 +381,11 @@
         HostName = "139.59.220.113";
         User = "ronghua";
       };
+
+      vps = {
+        HostName = "107.172.82.73";
+        User = "zi";
+      };
     };
   };
 
@@ -397,8 +426,16 @@
   xdg.configFile."ghostty/config".source = ../../dotfiles/ghostty/config;
   xdg.configFile."dunst/dunstrc".force = true;
   xdg.configFile."dunst/dunstrc".source = ../../dotfiles/dunst/dunstrc;
-  xdg.configFile."clash-verge-rev/merge-hk.yaml".source = ../../dotfiles/clash/merge-hk.yaml;
-  xdg.configFile."clash-verge-rev/merge-cn.yaml".source = ../../dotfiles/clash/merge-cn.yaml;
+  xdg.configFile."Throne/route-from-nix/hk-ai-only.json".source =
+    ../../dotfiles/throne/hk-ai-only.json;
+  xdg.configFile."Throne/route-from-nix/hk-ai-only.link".source =
+    ../../dotfiles/throne/hk-ai-only.link;
+  xdg.configFile."Throne/route-from-nix/cn-bypass.json".source =
+    ../../dotfiles/throne/cn-bypass.json;
+  xdg.configFile."Throne/route-from-nix/cn-bypass.link".source =
+    ../../dotfiles/throne/cn-bypass.link;
+  xdg.configFile."Throne/route-from-nix/README.org".source =
+    ../../dotfiles/throne/README.org;
   home.activation.cloneEmacs = config.lib.dag.entryAfter ["writeBoundary"] ''
     if [ ! -d "$HOME/.emacs.d/.git" ]; then
       rm -rf "$HOME/.emacs.d"

@@ -20,12 +20,9 @@
 # programs.throne.enable already installs it. tunMode.enable without
 # enable does not apply the capability wrapper, and TUN then fails.
 #
-# GUI routing checklist (HK mode; not Nix-managed):
-#   DIRECT: localhost, 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12,
-#           192.168.0.0/16, *.astaple.com
-#   Proxy:  chatgpt.com, openai.com, anthropic.com, claude.ai,
-#           oaistatic.com, oaiusercontent.com, intercom.io, intercomcdn.com
-#   MATCH:  DIRECT
+# Paste-ready profiles (GUI import, not applied by Nix):
+#   ~/.config/Throne/route-from-nix/hk-ai-only.txt
+#   ~/.config/Throne/route-from-nix/cn-bypass.txt
 {
   programs.throne = {
     enable = true;

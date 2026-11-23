@@ -1,0 +1,39 @@
+# Throne structured profile: CN bypass (mainland)
+# Settings → Routing Settings → Route → New → Structured profile
+# Name: CN bypass
+# Default outbound: proxy
+#
+# Then Basic tab. Direct is evaluated before Proxy.
+# WeChat/QQ/Baidu hit geosite-cn → DIRECT.
+# Google/GitHub/YouTube/Telegram miss → default PROXY.
+# AI suffixes are listed under Proxy as a belt-and-suspenders list
+# (they are not in geosite-cn). If a CN CDN ever swallows one,
+# Advanced tab: move Simple Address Proxy above Simple Address Bypass.
+
+# --- Direct ---
+ip:127.0.0.0/8
+ip:10.0.0.0/8
+ip:172.16.0.0/12
+ip:192.168.0.0/16
+suffix:astaple.com
+ruleset:geosite-cn
+ruleset:geoip-cn
+
+# --- Proxy ---
+ruleset:geosite-openai
+ruleset:geosite-anthropic
+ruleset:geosite-google-gemini
+suffix:chatgpt.com
+suffix:openai.com
+suffix:oaistatic.com
+suffix:oaiusercontent.com
+suffix:anthropic.com
+suffix:claude.ai
+suffix:intercom.io
+suffix:intercomcdn.com
+suffix:gemini.google.com
+suffix:aistudio.google.com
+suffix:generativelanguage.googleapis.com
+suffix:cloudcode-pa.googleapis.com
+suffix:daily-cloudcode-pa.googleapis.com
+suffix:aiplatform.googleapis.com

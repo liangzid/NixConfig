@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let
+  wrapTz = import ../../modules/lib/wrap-tz.nix { inherit pkgs lib; };
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -11,6 +14,7 @@
     ../../modules/system/portal.nix
     ../../modules/system/kanata.nix
     ../../modules/system/zen-browser.nix
+    ../../modules/system/throne.nix
   ];
 
   hardware.uinput.enable = true;
@@ -34,6 +38,8 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_HK.UTF-8";
+  # wrap-tz sets LANG=en_US.UTF-8 on browsers/AI CLIs; glibc needs the locale.
+  i18n.extraLocales = [ "en_US.UTF-8/UTF-8" ];
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -135,6 +141,7 @@
     "widevine-cdm"
     "telegram-desktop"
     "grok-bot"
+    "claude-code"
   ];
 
   environment.shellAliases = {
@@ -160,9 +167,10 @@
     fzf
     duf
     ncdu
-    llm-agents.claw-code
+    (wrapTz { pkg = llm-agents.claw-code; bins = [ "claw" ]; })
+    (wrapTz { pkg = claude-code; bins = [ "claude" ]; })
     llm-agents.code
-    llm-agents.codex
+    (wrapTz { pkg = llm-agents.codex; bins = [ "codex" "codex-code-mode-host" ]; })
     llm-agents.cursor-agent
     llm-agents.dsh
     llm-agents.crush
@@ -174,7 +182,7 @@
     grok-bot
     pi-coding-agent
     nodejs
-    firefox
+    (wrapTz { pkg = firefox; bins = [ "firefox" ]; extraFlags = [ "--lang=en-US" ]; })
     git
     tmux
     fastfetch
@@ -196,7 +204,6 @@
     wpsoffice
     corefonts
     vista-fonts
-    clash-verge-rev
     udiskie
     system-config-printer
 
