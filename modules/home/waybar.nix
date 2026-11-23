@@ -2,8 +2,9 @@
 # WAYBAR
 #
 # 1. 提供 Hyprland 顶栏、工作区导航和系统状态组件。
-# 2. 调用链：Home Manager → patched Waybar → Hyprland Lua IPC。
+# 2. 调用链：Home Manager → Waybar 0.16 IPC::dispatch → Hyprland Lua IPC。
 # 3. 修改历史：2026-08-30 修复 Lua 工作区点击；工作区按钮改为直角风格。
+#    2026-11-18 删除过期 0.15 overlay，改用上游 PR #5013。
 #
 #     Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
 #     Copyright © 2026, Zi Liang, all rights reserved.
@@ -12,18 +13,9 @@
 
 { config, pkgs, ... }:
 
-let
-  # REVIEW: Waybar 0.15 尚未支持 Hyprland 0.56 的 Lua workspace dispatch。
-  waybarWithHyprlandLuaWorkspaceClick = pkgs.waybar.overrideAttrs (oldAttrs: {
-    patches = (oldAttrs.patches or [ ]) ++ [
-      ../../patches/waybar-hyprland-lua-workspace-click.patch
-    ];
-  });
-in
 {
   programs.waybar = {
     enable = true;
-    package = waybarWithHyprlandLuaWorkspaceClick;
     settings = [{
       layer = "top";
       position = "top";

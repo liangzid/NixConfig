@@ -258,5 +258,6 @@ hl.bind("XF86AudioPrev",        hl.dsp.exec_cmd("playerctl previous"))
 --------------------
 hl.bind("Print",           hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
 hl.bind("XF86Calculator",  hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
+hl.bind("CTRL + ALT + A",  hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
 hl.bind("CTRL + Print",    hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh screen"))
 hl.bind("CTRL + XF86Calculator", hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh screen"))
