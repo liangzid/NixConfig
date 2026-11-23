@@ -32,6 +32,7 @@ suffix:claude.ai
 suffix:intercom.io
 suffix:intercomcdn.com
 suffix:gemini.google.com
+suffix:antigravity.google
 suffix:aistudio.google.com
 suffix:generativelanguage.googleapis.com
 suffix:cloudcode-pa.googleapis.com

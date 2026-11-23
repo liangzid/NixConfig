@@ -67,7 +67,7 @@ Nix/NixOS 的核心理念：
 | 截图      | grim/slurp/swappy                  |
 | 壁纸      | awww                               |
 | 编辑器    | emacs/vim                          |
-| Agent     | pi-coding-agent, grok-bot, openclaw, llm-agents（claw-code、code、codex、crush、dsh、omp、opencode、reasonix、hermes-desktop、agent-browser） |
+| Agent     | pi-coding-agent, grok-bot, openclaw, llm-agents（claw-code、code、codex、crush、dsh、omp、opencode、reasonix、hermes-desktop、agent-browser、antigravity-cli、antigravity-hub） |
 | VPN/代理  | throne（TUN；原 NekoRay）           |
 |-----------+------------------------------------|
 
@@ -78,7 +78,7 @@ Nix/NixOS 的核心理念：
 + *完全声明式* — 所有软件包、服务与 dotfile 均由 Nix 描述，任意机器皆可复现。
 + *轻量高效* — 默认为 TTY，按需启动 Hyprland。无冗余。
 + *Flake 驱动* — 锁定依赖版本，原子化升级，内建回滚。
-*开箱即用的开发环境* — Emacs、Ghostty、Zellij、一套精选的 LLM 编程助手 (=pi=、=opencode=、=codex=、=reasonix=、=crush=、=claw-code=、=code=、=dsh=、=omp=、=hermes-desktop=、=agent-browser=)、SSH 跳板机。
+*开箱即用的开发环境* — Emacs、Ghostty、Zellij、一套精选的 LLM 编程助手 (=pi=、=opencode=、=codex=、=reasonix=、=crush=、=claw-code=、=code=、=dsh=、=omp=、=hermes-desktop=、=agy=、=antigravity=、=agent-browser=)、SSH 跳板机。
 + *Wayland 原生* — 无需 X11 兼容层。截图、流畅动画。
 + *中文友好* — fcitx5 + rime，WeChat、QQ、WPS Office、CJK 字体。
 + *游戏支持* — Steam 含 32 位库，NVIDIA 驱动。
@@ -107,6 +107,8 @@ Nix/NixOS 的核心理念：
 + =llm-agents.code= — 通用编程助手
 + =llm-agents.omp= — Oh My Pi 编程助手
 + =llm-agents.hermes-desktop= — 桌面 UI 助手
++ =llm-agents.antigravity-cli= (=agy=) — Google Antigravity CLI，吃 Gemini 个人订阅（unfree）
++ =llm-agents.antigravity-hub= (=antigravity=) — Antigravity 2.x 桌面（unfree）
 + =llm-agents.agent-browser= — 浏览器驱动的代理
 + =grok-bot= — xAI 桌面 Agent，来自 [[https://github.com/jordangarrison/grok-bot-flake][jordangarrison/grok-bot-flake]]（重打包 =.deb=）
 
@@ -430,8 +432,8 @@ flake 要求所有引用的文件被 Git 追踪。你可能新增或替换了
 ** Throne / 代理重建后无法使用
 
 =throne= 已安装并具备 TUN 权限，但不含节点。从 wofi 打开 =Throne= →
-导入 VLESS/VMess 链接或订阅 → 打开 TUN Mode。分流只在 GUI 里配
-（默认 DIRECT，仅 AI 域名走代理，域名表见 [[./modules/system/throne.nix][throne.nix]] 注释）。
+导入 VLESS/VMess 链接或订阅 → 打开 TUN Mode。分流只在 GUI 里配；
+导入 [[./dotfiles/throne/hk-ai-only.link][hk-ai-only.link]] 或 [[./dotfiles/throne/cn-bypass.link][cn-bypass.link]]。
 不要把订阅写进 git。
 
 ** Hyprland 无法启动（只有 TTY） / "start-hyprland" 找不到
@@ -544,14 +546,15 @@ Nix 只负责安装客户端和 TUN 权限。重建后：
    =cn-bypass.link=）里那一整行，切到 Throne 主窗口按 =Ctrl+V=。
    再在 =Routing= 菜单选中该 profile；若已在连接就点 =Restart=。
    步骤见 [[./dotfiles/throne/README.org][dotfiles/throne/README.org]]。
-   - =HK AI only=：默认 DIRECT，只有 OpenAI/Anthropic/Gemini agent
-     端点（及列出的后缀）走 VPS。
+   - =HK AI only=：默认 DIRECT。OpenAI/Anthropic 走 VPS。Google 一律
+     直连，只有 =agy= 的三个 API 主机（=aicode= / =cloudcode-pa= /
+     =daily-cloudcode-pa=）走代理。
    - =CN bypass=：局域网 + =*.astaple.com= + =geosite-cn= / =geoip-cn=
      直连，其余走代理。
 
 系统时区仍是 =Asia/Hong_Kong=，会话 locale 仍是 =en_HK=。Zen、Firefox、
-Chrome、Vivaldi、=claude=、=claw= 和 =codex= 包了
-=TZ=America/Los_Angeles= 和 =LANG=en_US.UTF-8=（浏览器另加 =--lang=en-US=）。
+Chrome、Vivaldi、=claude=、=claw=、=codex=、=agy= 和 =antigravity= 包了
+=TZ=America/Los_Angeles= 和 =LANG=en_US.UTF-8=（浏览器/=antigravity= 另加 =--lang=en-US=）。
 rebuild 后要彻底退出这些程序再开；Chrome 必须从 PATH/=wofi= 启动。
 Waybar 和 =date= 仍是香港时间。
 

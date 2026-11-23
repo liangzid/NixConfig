@@ -142,6 +142,8 @@ in
     "telegram-desktop"
     "grok-bot"
     "claude-code"
+    "antigravity-cli"
+    "antigravity-hub"
   ];
 
   environment.shellAliases = {
@@ -169,6 +171,15 @@ in
     ncdu
     (wrapTz { pkg = llm-agents.claw-code; bins = [ "claw" ]; })
     (wrapTz { pkg = claude-code; bins = [ "claude" ]; })
+    # KEYPOINT (review): Google AI Pro/Ultra uses Antigravity, not
+    # gemini-cli (personal plans stopped 2026-06-18). llm-agents is
+    # newer than nixpkgs (agy 1.5.11 vs 1.5.6; hub is not in nixpkgs).
+    (wrapTz { pkg = llm-agents.antigravity-cli; bins = [ "agy" ]; })
+    (wrapTz {
+      pkg = llm-agents.antigravity-hub;
+      bins = [ "antigravity" ];
+      extraFlags = [ "--lang=en-US" ];
+    })
     llm-agents.code
     (wrapTz { pkg = llm-agents.codex; bins = [ "codex" "codex-code-mode-host" ]; })
     llm-agents.cursor-agent

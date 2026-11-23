@@ -43,8 +43,11 @@ TARGETS=(
   'Anthropic API|https://api.anthropic.com'
   'Gemini|https://gemini.google.com'
   'Gemini API|https://generativelanguage.googleapis.com'
-  'Gemini CLI|https://cloudcode-pa.googleapis.com'
+  'Antigravity site|https://antigravity.google'
   'AI Studio|https://aistudio.google.com'
+  'agy aicode|https://aicode.googleapis.com'
+  'agy cloudcode|https://cloudcode-pa.googleapis.com'
+  'agy daily-cloudcode|https://daily-cloudcode-pa.googleapis.com'
 )
 
 unset_proxy_env() {

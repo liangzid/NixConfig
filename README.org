@@ -76,7 +76,7 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agents         | pi-coding-agent, grok-bot, openclaw, llm-agents (claw-code, code, codex, crush, dsh, omp, opencode, reasonix, hermes-desktop, agent-browser) |
+| Agents         | pi-coding-agent, grok-bot, openclaw, llm-agents (claw-code, code, codex, crush, dsh, omp, opencode, reasonix, hermes-desktop, agent-browser, antigravity-cli, antigravity-hub) |
 | VPN/Proxy      | throne (TUN; formerly NekoRay) |
 |----------------+-------------------------------|
 
@@ -87,7 +87,7 @@ Note: This list will keep increase and changed dynamically.
 + *Fully Declarative* — every package, service, and dotfile is described in Nix, reproducible on any machine.
 + *Minimal & Fast* — TTY by default, Hyprland on demand. No bloat.
 + *Flake-Powered* — pinned dependencies, atomic upgrades, rollbacks built-in.
- *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =dsh=, =omp=, =hermes-desktop=, =agent-browser=), SSH with jump hosts.
+ *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =dsh=, =omp=, =hermes-desktop=, =agy=, =antigravity=, =agent-browser=), SSH with jump hosts.
 + *Wayland Native* — no X11 legacy. Screenshots, smooth animations.
 + *Chinese-Friendly* — fcitx5 + rime, WeChat, QQ, WPS Office, CJK fonts.
 + *Gaming Support* — Steam with 32-bit libs, NVIDIA drivers.
@@ -117,6 +117,8 @@ declared in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 + =llm-agents.code= — generic coding agent
 + =llm-agents.omp= — Oh My Pi coding agent
 + =llm-agents.hermes-desktop= — desktop UI agent
++ =llm-agents.antigravity-cli= (=agy=) — Google Antigravity CLI for Gemini subscription (unfree)
++ =llm-agents.antigravity-hub= (=antigravity=) — Antigravity 2.x desktop app (unfree)
 + =llm-agents.agent-browser= — browser-driven agent
 + =grok-bot= — xAI desktop agent, from [[https://github.com/jordangarrison/grok-bot-flake][jordangarrison/grok-bot-flake]] (repackaged =.deb=)
 
@@ -462,8 +464,8 @@ to =ServerAliveCountMax 999= in [[./hosts/nixos/home.nix][home.nix]].
 
 =throne= is installed with TUN privileges but does not contain your
 nodes. Open =Throne= from wofi → import a VLESS/VMess link or
-subscription → enable TUN Mode. Routing is GUI-only (default DIRECT;
-proxy only AI domains listed in [[./modules/system/throne.nix][throne.nix]] comments). Do not put
+subscription → enable TUN Mode. Routing is GUI-only; import
+[[./dotfiles/throne/hk-ai-only.link][hk-ai-only.link]] or [[./dotfiles/throne/cn-bypass.link][cn-bypass.link]]. Do not put
 subscriptions in git.
 
 ** Hyprland doesn't start (TTY only) / "start-hyprland" not found
@@ -564,16 +566,18 @@ Nix only installs the client and TUN capabilities. After rebuild:
    =cn-bypass.link=), focus Throne, press =Ctrl+V=. Then pick the
    profile in the =Routing= menu and =Restart= if a connection is up.
    Details: [[./dotfiles/throne/README.org][dotfiles/throne/README.org]].
-   - =HK AI only=: default DIRECT; only OpenAI/Anthropic/Gemini agent
-     endpoints (and listed suffixes) go through the VPS.
+   - =HK AI only=: default DIRECT. OpenAI/Anthropic go through the
+     VPS. All Google stays DIRECT except the three =agy= API hosts
+     (=aicode= / =cloudcode-pa= / =daily-cloudcode-pa=).
    - =CN bypass=: LAN + =*.astaple.com= + =geosite-cn= / =geoip-cn=
      DIRECT; everything else PROXY.
 
 System timezone stays =Asia/Hong_Kong= and the session locale stays
-=en_HK=. Zen, Firefox, Chrome, Vivaldi, =claude=, =claw= and =codex=
-are wrapped with =TZ=America/Los_Angeles= and =LANG=en_US.UTF-8= (plus
-browser =--lang=en-US=) so JS reports US Pacific + English. Fully quit
-those apps after rebuild; Chrome must be launched via PATH/=wofi=, not
+=en_HK=. Zen, Firefox, Chrome, Vivaldi, =claude=, =claw=, =codex=,
+=agy= and =antigravity= are wrapped with =TZ=America/Los_Angeles= and
+=LANG=en_US.UTF-8= (plus browser/=antigravity= =--lang=en-US=) so JS
+reports US Pacific + English. Fully quit those apps after rebuild;
+Chrome must be launched via PATH/=wofi=, not
 an old store-path .desktop. Waybar and =date= stay on HKT.
 
 If TUN comes up but DNS fails (=ping 8.8.8.8= works, domains do not),
