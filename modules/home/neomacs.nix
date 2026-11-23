@@ -9,6 +9,8 @@
 #    VK_DRIVER_FILES to mesa; outer --set points at the NVIDIA ICD.
 #    22 October 2026: drop bin/emacs and bin/emacsclient so home-manager
 #    buildEnv does not collide with programs.emacs (emacs-pgtk).
+#    19 November 2026: also drop emacs-VERSION; 31.1 alias survived the
+#    unversioned rm and collided with emacs-pgtk-with-packages.
 #
 # Author: Zi Liang <zi1415926.liang@connect.polyu.hk>
 # Copyright © 2026, Zi Liang, all rights reserved.
@@ -38,9 +40,10 @@ let
     postBuild = ''
       ${wrapBinIfPresent "$out" "neomacs"}
       ${wrapBinIfPresent "$out" "neomacsclient"}
-      # KEYPOINT (review): upstream ships emacs -> neomacs and
-      # emacsclient -> neomacsclient. GNU emacs-pgtk must keep those names.
-      rm -f "$out/bin/emacs" "$out/bin/emacsclient"
+      # KEYPOINT (review): upstream ships emacs, emacs-VERSION, and
+      # emacsclient as aliases. GNU emacs-pgtk must keep those names.
+      rm -f "$out/bin"/emacs "$out/bin"/emacs-* \
+            "$out/bin"/emacsclient "$out/bin"/emacsclient-*
     '';
   };
 in {
