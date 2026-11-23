@@ -76,8 +76,8 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agents         | pi-coding-agent, llm-agents (claw-code, code, codex, crush, omp, opencode, reasonix, hermes-desktop, agent-browser) |
-| VPN/Proxy      | clash-verge-rev               |
+| Agents         | pi-coding-agent, grok-bot, openclaw, llm-agents (claw-code, code, codex, crush, dsh, omp, opencode, reasonix, hermes-desktop, agent-browser, antigravity-cli, antigravity-hub) |
+| VPN/Proxy      | throne (TUN; formerly NekoRay) |
 |----------------+-------------------------------|
 
 Note: This list will keep increase and changed dynamically.
@@ -87,7 +87,7 @@ Note: This list will keep increase and changed dynamically.
 + *Fully Declarative* — every package, service, and dotfile is described in Nix, reproducible on any machine.
 + *Minimal & Fast* — TTY by default, Hyprland on demand. No bloat.
 + *Flake-Powered* — pinned dependencies, atomic upgrades, rollbacks built-in.
- *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =omp=, =hermes-desktop=, =agent-browser=), SSH with jump hosts.
+ *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =reasonix=, =crush=, =claw-code=, =code=, =dsh=, =omp=, =hermes-desktop=, =agy=, =antigravity=, =agent-browser=), SSH with jump hosts.
 + *Wayland Native* — no X11 legacy. Screenshots, smooth animations.
 + *Chinese-Friendly* — fcitx5 + rime, WeChat, QQ, WPS Office, CJK fonts.
 + *Gaming Support* — Steam with 32-bit libs, NVIDIA drivers.
@@ -96,7 +96,7 @@ Note: This list will keep increase and changed dynamically.
 
 + Input Method: =fcitx5= with =rime= and =pinyin=, theme =Material-Color-deepPurple=
 + Communication: =wechat-uos=, =qq=
-+ VPN: =clash-verge-rev=
++ VPN: =throne= (TUN; formerly NekoRay)
   
 
 ** Coding Agents
@@ -110,11 +110,17 @@ declared in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 + =llm-agents.codex= — OpenAI Codex CLI
 + =llm-agents.reasonix= — reasoning-focused agent
 + =llm-agents.crush= — interactive coding agent
-+ =llm-agents.claw-code= — Anthropic Claude Code-style agent
++ =llm-agents.dsh= — DeepSeek Harness (`dsh` CLI; on PATH, not a service)
++ =openclaw= — Telegram gateway via official =nix-openclaw= Home Manager module; user service at boot; model deferred
++ =claude-code= (=claude=) — official Anthropic Claude Code from nixpkgs (unfree)
++ =llm-agents.claw-code= (=claw=) — Claude Code-style agent, not the official CLI
 + =llm-agents.code= — generic coding agent
 + =llm-agents.omp= — Oh My Pi coding agent
 + =llm-agents.hermes-desktop= — desktop UI agent
++ =llm-agents.antigravity-cli= (=agy=) — Google Antigravity CLI for Gemini subscription (unfree)
++ =llm-agents.antigravity-hub= (=antigravity=) — Antigravity 2.x desktop app (unfree)
 + =llm-agents.agent-browser= — browser-driven agent
++ =grok-bot= — xAI desktop agent, from [[https://github.com/jordangarrison/grok-bot-flake][jordangarrison/grok-bot-flake]] (repackaged =.deb=)
 
 Pi ([[https://github.com/earendil-works/pi-mono][pi-mono]]) is updated via the NixOS flake update cycle (=upgrade= alias),
 not through =pi update=. The environment variable =PI_OFFLINE=1= is set in
@@ -150,7 +156,8 @@ nix-config/
 │   │   ├── input-method.nix  # fcitx5 + rime + cloudpinyin + theme
 │   │   ├── pipewire.nix      # Audio: pipewire + alsa + pulse
 │   │   ├── portal.nix        # XDG desktop portal for Wayland
-│   │   └── kanata.nix        # CapsLock → Control remap
+│   │   ├── kanata.nix        # CapsLock → Control remap
+│   │   └── throne.nix        # Throne TUN client for VLESS nodes
 │   └── home/                 # Reusable home-manager modules
 │       ├── emacs.nix          # Emacs + vterm
 │       ├── waybar.nix        # Status bar with tokyonight theme
@@ -159,8 +166,7 @@ nix-config/
     ├── hypr/hyprland.lua     # Hyprland keybindings + autostart
     ├── wofi/{config,style.css}
     ├── ghostty/config        # Terminal with Tokyo Night theme
-    ├── clash/merge-hk.yaml   # GFW bypass rules (Hong Kong mode)
-    ├── clash/merge-cn.yaml   # GFW bypass rules (Mainland mode)
+    ├── throne/{hk-ai-only,cn-bypass}.json  # Throne Ctrl+V import profiles
     └── (fcitx5 config now declarative via i18n.inputMethod.fcitx5.settings)
 #+end_src
 
@@ -454,12 +460,13 @@ and =home.nix= (=home.username=, =home.homeDirectory=).
 Older SSH clients reject very large =ServerAliveCountMax= values. Change it
 to =ServerAliveCountMax 999= in [[./hosts/nixos/home.nix][home.nix]].
 
-** Clash / Proxy not working after rebuild
+** Throne / Proxy not working after rebuild
 
-=clash-verge-rev= requires a subscription URL to function. It is installed
-but not pre-configured with your subscription. Open the app → Profiles →
-add your subscription. Then point Merge to the appropriate yaml in
-=~/.config/clash-verge-rev/=.
+=throne= is installed with TUN privileges but does not contain your
+nodes. Open =Throne= from wofi → import a VLESS/VMess link or
+subscription → enable TUN Mode. Routing is GUI-only; import
+[[./dotfiles/throne/hk-ai-only.link][hk-ai-only.link]] or [[./dotfiles/throne/cn-bypass.link][cn-bypass.link]]. Do not put
+subscriptions in git.
 
 ** Hyprland doesn't start (TTY only) / "start-hyprland" not found
 
@@ -512,6 +519,7 @@ All keybindings are defined in [[./dotfiles/hypr/hyprland.lua][dotfiles/hypr/hyp
 | =Ctrl + Alt + T=        | Open terminal (alternative)      |
 | =Print=                 | Screenshot region → annotate     |
 | =Calculator=            | Screenshot region → annotate     |
+| =Ctrl + Alt + A=        | Screenshot region → annotate     |
 | =Ctrl + Print=          | Fullscreen screenshot → clipboard|
 | =Ctrl + Calculator=     | Fullscreen screenshot → clipboard|
 
@@ -541,17 +549,40 @@ All SSH servers are defined in [[./hosts/nixos/home.nix][home.nix]]. Each server
 SSH keepalive (=ServerAliveInterval 60=) prevents idle disconnection,
 and =AddKeysToAgent yes= caches key passphrases in memory.
 
-* GFW Bypass (Clash Verge Rev)
+* GFW Bypass (Throne)
 
-[[https://github.com/clash-verge-rev/clash-verge-rev][clash-verge-rev]] is installed for proxy management.
-Two merge configs are provided for switching between regions:
+[[https://github.com/throneproj/Throne][Throne]] (formerly NekoRay) is installed via
+[[./modules/system/throne.nix][modules/system/throne.nix]] with TUN mode, so WeChat/QQ/Steam and other
+apps that ignore =HTTP_PROXY= can use VLESS/VMess nodes.
 
-- =merge-hk.yaml=: most traffic → DIRECT, only AI services (ChatGPT, OpenAI,
-  Anthropic) → Proxy
-- =merge-cn.yaml=: subscription handles default routing, with additional
-  rules for lab servers and AI services
+Nix only installs the client and TUN capabilities. After rebuild:
 
-To switch: Profiles → subscription → Edit Info → Merge → point to the desired yaml.
+1. Open =Throne= from wofi (it is not autostarted).
+2. Import your VLESS/VMess link or subscription. Do not commit it.
+3. Enable TUN Mode.
+4. Import routing *links* (main-window =Ctrl+V= ignores JSON; it only
+   imports subscriptions). Copy the single line in
+   =~/.config/Throne/route-from-nix/hk-ai-only.link= (or
+   =cn-bypass.link=), focus Throne, press =Ctrl+V=. Then pick the
+   profile in the =Routing= menu and =Restart= if a connection is up.
+   Details: [[./dotfiles/throne/README.org][dotfiles/throne/README.org]].
+   - =HK AI only=: default DIRECT. OpenAI/Anthropic go through the
+     VPS. All Google stays DIRECT except the three =agy= API hosts
+     (=aicode= / =cloudcode-pa= / =daily-cloudcode-pa=).
+   - =CN bypass=: LAN + =*.astaple.com= + =geosite-cn= / =geoip-cn=
+     DIRECT; everything else PROXY.
+
+System timezone stays =Asia/Hong_Kong= and the session locale stays
+=en_HK=. Zen, Firefox, Chrome, Vivaldi, =claude=, =claw=, =codex=,
+=agy= and =antigravity= are wrapped with =TZ=America/Los_Angeles= and
+=LANG=en_US.UTF-8= (plus browser/=antigravity= =--lang=en-US=) so JS
+reports US Pacific + English. Fully quit those apps after rebuild;
+Chrome must be launched via PATH/=wofi=, not
+an old store-path .desktop. Waybar and =date= stay on HKT.
+
+If TUN comes up but DNS fails (=ping 8.8.8.8= works, domains do not),
+check =resolvectl status=. Do not add =trustedInterfaces= until you
+know the actual TUN interface name.
 
 * Input Method
 

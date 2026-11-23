@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let
+  wrapTz = import ../../modules/lib/wrap-tz.nix { inherit pkgs lib; };
+in
 {
   imports = [
     ./hardware-configuration.nix
@@ -10,6 +13,8 @@
     ../../modules/system/pipewire.nix
     ../../modules/system/portal.nix
     ../../modules/system/kanata.nix
+    ../../modules/system/zen-browser.nix
+    ../../modules/system/throne.nix
   ];
 
   hardware.uinput.enable = true;
@@ -33,6 +38,8 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_HK.UTF-8";
+  # wrap-tz sets LANG=en_US.UTF-8 on browsers/AI CLIs; glibc needs the locale.
+  i18n.extraLocales = [ "en_US.UTF-8/UTF-8" ];
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -98,11 +105,15 @@
       "https://cache.numtide.com"
       "https://hyprland.cachix.org"
       "https://nix-community.cachix.org"
+      "https://eval-exec.cachix.org"
+      "https://nix-wpe-webkit.cachix.org"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       "hyprland.cachix.org-1:a7pgxzMz7+chwmg3VQLluhnv4v3C4Y0sYc5LmPzO2v0="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "eval-exec.cachix.org-1:xvopUI7X7+Vt1gaSsWJ0PQFPP66vs8v5iIaz6boxf64="
+      "nix-wpe-webkit.cachix.org-1:ItCjHkz1Y5QcwqI9cTGNWHzcox4EqcXqKvOygxpwYHE="
     ];
   };
 
@@ -129,7 +140,13 @@
     "corefonts"
     "vista-fonts"
     "google-chrome"
+    "vivaldi"
+    "widevine-cdm"
     "telegram-desktop"
+    "grok-bot"
+    "claude-code"
+    "antigravity-cli"
+    "antigravity-hub"
   ];
 
   environment.shellAliases = {
@@ -155,19 +172,31 @@
     fzf
     duf
     ncdu
-    llm-agents.claw-code
+    (wrapTz { pkg = llm-agents.claw-code; bins = [ "claw" ]; })
+    (wrapTz { pkg = claude-code; bins = [ "claude" ]; })
+    # KEYPOINT (review): Google AI Pro/Ultra uses Antigravity, not
+    # gemini-cli (personal plans stopped 2026-06-18). llm-agents is
+    # newer than nixpkgs (agy 1.5.11 vs 1.5.6; hub is not in nixpkgs).
+    (wrapTz { pkg = llm-agents.antigravity-cli; bins = [ "agy" ]; })
+    (wrapTz {
+      pkg = llm-agents.antigravity-hub;
+      bins = [ "antigravity" ];
+      extraFlags = [ "--lang=en-US" ];
+    })
     llm-agents.code
-    llm-agents.codex
+    (wrapTz { pkg = llm-agents.codex; bins = [ "codex" "codex-code-mode-host" ]; })
     llm-agents.cursor-agent
+    llm-agents.dsh
     llm-agents.crush
     llm-agents.omp
     llm-agents.opencode
     llm-agents.reasonix
     llm-agents.hermes-desktop
     llm-agents.agent-browser
+    grok-bot
     pi-coding-agent
     nodejs
-    firefox
+    (wrapTz { pkg = firefox; bins = [ "firefox" ]; extraFlags = [ "--lang=en-US" ]; })
     git
     tmux
     fastfetch
@@ -195,9 +224,16 @@
     nautilus
     nautilus-python
     gnome-disk-utility
+    caligula
     loupe
     adwaita-icon-theme
   ];
+
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+  programs.thunderbird.enable = true;
 
   programs.nm-applet.enable = true;
   programs.dconf.enable = true;

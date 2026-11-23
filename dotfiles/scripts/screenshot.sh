@@ -6,7 +6,7 @@ set -euo pipefail
 #
 # 1. 用 grimblast 截图，区域交给 satty 标注（替代 grim|slurp|swappy）。
 # 2. 调用链：
-#      hyprland.lua Print / XF86Calculator
+#      hyprland.lua Print / XF86Calculator / CTRL+ALT+A
 #        └─ screenshot.sh area   → grimblast --freeze save area - | satty
 #      hyprland.lua CTRL+Print / CTRL+XF86Calculator
 #        └─ screenshot.sh screen → grimblast --notify copy screen

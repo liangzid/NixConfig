@@ -30,6 +30,8 @@ hl.env("LIBVA_DRIVER_NAME", "nvidia")
 hl.env("GBM_BACKEND", "nvidia-drm")
 hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 hl.env("WLR_NO_HARDWARE_CURSORS", "1")
+-- Electron（Grok Bot / Chrome / VS Code 等）走 Wayland，而不是默认 XWayland。
+hl.env("NIXOS_OZONE_WL", "1")
 
 local lock_cmd = "swaylock -f -S --effect-blur 7x5 --effect-vignette 0.3:0.4"
 
@@ -196,7 +198,7 @@ hl.bind(main_mod .. " + down",  hl.dsp.focus({ direction = "down" }))
 hl.bind(main_mod .. " + Tab",   hl.dsp.window.cycle_next())
 
 -- K for kill window, V for floating, F for Fullscreen (and back),
--- T for terminal, X for menu (like emacs), E for Explorer
+-- T for terminal, X for menu (like emacs), E for Explorer, B for Browser
 hl.bind(main_mod .. " + K", hl.dsp.window.close())
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 -- Super+V 仍是浮动；历史剪贴板用 Super+Shift+V，避免抢键。
@@ -206,6 +208,7 @@ hl.bind("CTRL + ALT + T",   hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + X", hl.dsp.exec_cmd(menu))
 hl.bind(main_mod .. " + E", hl.dsp.exec_cmd("nautilus"))
+hl.bind(main_mod .. " + B", hl.dsp.exec_cmd("zen"))
 
 -- Q for quit.
 hl.bind(main_mod .. " + Q", hl.dsp.exec_cmd(
@@ -261,5 +264,6 @@ hl.bind("XF86AudioPrev",        hl.dsp.exec_cmd("playerctl previous"))
 --------------------
 hl.bind("Print",           hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
 hl.bind("XF86Calculator",  hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
+hl.bind("CTRL + ALT + A",  hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh area"))
 hl.bind("CTRL + Print",    hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh screen"))
 hl.bind("CTRL + XF86Calculator", hl.dsp.exec_cmd("bash $HOME/scripts/screenshot.sh screen"))

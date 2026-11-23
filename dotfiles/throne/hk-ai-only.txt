@@ -1,0 +1,39 @@
+# Throne structured profile: HK AI only
+# Settings → Routing Settings → Route → New → Structured profile
+# Name: HK AI only
+# Default outbound: direct
+#
+# Then Basic tab. One entry per line. Prefixes are case-sensitive.
+# Activate from Routing menu → HK AI only.
+#
+# KEYPOINT (review): Google is NOT listed under Direct. Default is
+# already DIRECT. A geosite-google / suffix:googleapis.com Direct rule
+# would match before Proxy and swallow the agy hosts (shared 172.217
+# anycast). Do not add it.
+#
+# Google web / AI Studio / gemini.google.com / geosite-google-gemini
+# stay on the default (DIRECT). Only the three Cloud Code Assist hosts
+# that agy actually calls go through the VPS.
+
+# --- Direct ---
+ip:127.0.0.0/8
+ip:10.0.0.0/8
+ip:172.16.0.0/12
+ip:192.168.0.0/16
+suffix:astaple.com
+
+# --- Proxy (HK-blocked AI; Google except agy APIs stays DIRECT) ---
+# If the editor marks a ruleset line invalid, delete that line; suffixes stay.
+ruleset:geosite-openai
+ruleset:geosite-anthropic
+suffix:chatgpt.com
+suffix:openai.com
+suffix:oaistatic.com
+suffix:oaiusercontent.com
+suffix:anthropic.com
+suffix:claude.ai
+suffix:intercom.io
+suffix:intercomcdn.com
+suffix:aicode.googleapis.com
+suffix:cloudcode-pa.googleapis.com
+suffix:daily-cloudcode-pa.googleapis.com
