@@ -33,7 +33,8 @@ hl.env("WLR_NO_HARDWARE_CURSORS", "1")
 -- Electron（Grok Bot / Chrome / VS Code 等）走 Wayland，而不是默认 XWayland。
 hl.env("NIXOS_OZONE_WL", "1")
 
-local lock_cmd = "swaylock -f -S --effect-blur 7x5 --effect-vignette 0.3:0.4"
+-- Single-instance lock (no screenshot). See dotfiles/scripts/lock.sh.
+local lock_cmd = (os.getenv("HOME") or "/home/zi") .. "/scripts/lock.sh"
 
 --------------------
 ---- AUTOSTART ----
@@ -56,9 +57,16 @@ hl.on("hyprland.start", function()
 
     -- Auto-lock on idle is intentionally disabled. Display still powers off
     -- after 600s, and the screen is still locked on suspend / lid close.
+    -- lock.sh is idempotent: lid bind + before-sleep will not start two
+    -- swaylocks. after-resume turns the panel back on (key to wake is a
+    -- known Hyprland/NVIDIA resume glitch).
     -- 注意：0.56 起 hyprctl dispatch 只接受 Lua 表达式，不能用旧的 `dpms off`。
-    hl.exec_cmd([[
-swayidle -w timeout 600 "hyprctl dispatch 'hl.dsp.dpms({ action = \"off\" })'" resume "hyprctl dispatch 'hl.dsp.dpms({ action = \"on\" })'" before-sleep ']] .. lock_cmd .. [[']])
+    local dpms_off = [[hyprctl dispatch 'hl.dsp.dpms({ action = "off" })']]
+    local dpms_on  = [[hyprctl dispatch 'hl.dsp.dpms({ action = "on" })']]
+    hl.exec_cmd(string.format(
+        [[swayidle -w timeout 600 %q resume %q before-sleep %q after-resume %q]],
+        dpms_off, dpms_on, lock_cmd, dpms_on
+    ))
 end)
 
 --------------------
@@ -130,6 +138,9 @@ hl.config({
 
     misc = {
         disable_hyprland_logo = true,
+        -- If swaylock dies across suspend, accept a new lock instead of
+        -- wedging on the lockdead screen that eats every key.
+        allow_session_lock_restore = true,
     },
 
     xwayland = {

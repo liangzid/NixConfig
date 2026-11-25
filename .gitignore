@@ -6,3 +6,5 @@ result
 hosts/nixos/env-private.json
 # Per-machine disk UUIDs — catastrophic if shared across hosts.
 hosts/nixos/hardware-configuration.nix
+# Per-machine MemTotal from /proc; written by nixos-rebuild-local.sh.
+hosts/nixos/detected-memory.nix

@@ -2,6 +2,9 @@
 
 let
   wrapTz = import ../../modules/lib/wrap-tz.nix { inherit pkgs lib; };
+  hostMemory = import ../../modules/lib/host-memory.nix {
+    hostDir = ./.;
+  };
 in
 {
   imports = [
@@ -13,8 +16,10 @@ in
     ../../modules/system/pipewire.nix
     ../../modules/system/portal.nix
     ../../modules/system/kanata.nix
+    ../../modules/system/atkbd-resume.nix
     ../../modules/system/zen-browser.nix
     ../../modules/system/throne.nix
+    ../../modules/system/codex-desktop.nix
   ];
 
   hardware.uinput.enable = true;
@@ -93,9 +98,11 @@ in
   };
 
   nix.settings = {
-    # i5-13400F（16 线程），放开并行度加速构建；cores=0 表示不限制。
-    max-jobs = 8;
-    cores = 0;
+    # 并行度按本机 RAM 算（rebuild 脚本从 /proc/meminfo 写入
+    # detected-memory.nix）。Nix 求值读不到 /proc，缺文件则按 16GiB。
+    # 本机 ~14GiB → max-jobs=2；读不到则 16GiB 兜底 → 3；cores 均为 4。
+    max-jobs = hostMemory.maxJobs;
+    cores = hostMemory.cores;
     # 保留 http2=false：疑似 Clash 代理时代的兼容设置；当前下载一切正常，
     # 移除有破坏代理下载的风险，收益不明显。确认代理无碍后可删除。
     http2 = false;
@@ -107,6 +114,7 @@ in
       "https://nix-community.cachix.org"
       "https://eval-exec.cachix.org"
       "https://nix-wpe-webkit.cachix.org"
+      "https://codex-desktop-linux.cachix.org"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
@@ -114,6 +122,7 @@ in
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "eval-exec.cachix.org-1:xvopUI7X7+Vt1gaSsWJ0PQFPP66vs8v5iIaz6boxf64="
       "nix-wpe-webkit.cachix.org-1:ItCjHkz1Y5QcwqI9cTGNWHzcox4EqcXqKvOygxpwYHE="
+      "codex-desktop-linux.cachix.org-1:nX/xy6AdK9hQE24A8ALGjkCKj2ObFmcnemiL5Cid4nk="
     ];
   };
 
@@ -147,6 +156,8 @@ in
     "claude-code"
     "antigravity-cli"
     "antigravity-hub"
+    "devin-desktop"
+    "codex-desktop"
   ];
 
   environment.shellAliases = {
@@ -194,6 +205,11 @@ in
     llm-agents.hermes-desktop
     llm-agents.agent-browser
     grok-bot
+    # KEYPOINT (review): Cognition Windsurf rebrand. nixpkgs fetchurl
+    # of the current Windsurf URL; upstream may stop serving old
+    # tarballs (nixpkgs#592672). If fetch fails, pin an older
+    # info.json or wait for a new hash bump.
+    devin-desktop
     pi-coding-agent
     nodejs
     (wrapTz { pkg = firefox; bins = [ "firefox" ]; extraFlags = [ "--lang=en-US" ]; })
@@ -260,9 +276,21 @@ in
   hardware.steam-hardware.enable = true;
   hardware.graphics.enable = true;
 
-  # 31G 内存 + 无磁盘 swap：zram 压缩内存作为 swap，防止内存压力下 OOM。
+  # zram 压缩页当 swap：不是额外物理内存，挡不住并行编译打满 RAM。
+  # 构建侧靠下面 nix-daemon 的 MemoryMax + 按 RAM 降并行度。
   # 如需休眠（suspend-to-disk）再另加 swapfile。
   zramSwap.enable = true;
+
+  # KEYPOINT (review): 百分数由 systemd 按开机物理内存解析，不要写死 GiB。
+  # 超限只杀 nix-daemon cgroup 里的构建进程（OOMPolicy=continue），
+  # 桌面会话留下。MemoryHigh 先节流，MemoryMax 才硬杀。
+  systemd.services.nix-daemon.serviceConfig = {
+    MemoryHigh = "50%";
+    MemoryMax = "70%";
+    OOMPolicy = "continue";
+    ManagedOOMMemoryPressure = "kill";
+    ManagedOOMSwap = "kill";
+  };
 
   environment.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.ghostty.terminfo}/share/terminfo";

@@ -6,7 +6,7 @@ in
 {
   imports = [
     ../../modules/home/emacs.nix
-    ../../modules/home/neomacs.nix
+    # ../../modules/home/neomacs.nix
     ../../modules/home/waybar.nix
     ../../modules/home/gtk.nix
     ../../modules/home/common-lisp.nix
@@ -184,6 +184,12 @@ in
 
   home.file."scripts/clipboard-hist.sh" = {
     source = ../../dotfiles/scripts/clipboard-hist.sh;
+    executable = true;
+    force = true;
+  };
+
+  home.file."scripts/lock.sh" = {
+    source = ../../dotfiles/scripts/lock.sh;
     executable = true;
     force = true;
   };
