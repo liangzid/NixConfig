@@ -76,7 +76,7 @@ The schema as list below:
 | Capture        | grim/slurp/swappy             |
 | Wallpaper      | awww                          |
 | Editor         | emacs/vim                     |
-| Agents         | pi-coding-agent, grok-bot, openclaw, devin-desktop, codex-desktop, llm-agents (claw-code, code, codex, crush, dsh, omp, opencode, reasonix, hermes-desktop, agent-browser, antigravity-cli, antigravity-hub) |
+| Agents         | pi-coding-agent, grok-bot, openclaw, devin-desktop, code-cursor, llm-agents (claw-code, code, codex, crush, dsh, omp, opencode, reasonix, hermes-desktop, agent-browser, antigravity-cli, antigravity-hub) |
 | VPN/Proxy      | throne (TUN; formerly NekoRay) |
 |----------------+-------------------------------|
 
@@ -87,7 +87,7 @@ Note: This list will keep increase and changed dynamically.
 + *Fully Declarative* — every package, service, and dotfile is described in Nix, reproducible on any machine.
 + *Minimal & Fast* — TTY by default, Hyprland on demand. No bloat.
 + *Flake-Powered* — pinned dependencies, atomic upgrades, rollbacks built-in.
- *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =codex-desktop=, =devin-desktop=, =reasonix=, =crush=, =claw-code=, =code=, =dsh=, =omp=, =hermes-desktop=, =agy=, =antigravity=, =agent-browser=), SSH with jump hosts.
+ *Developer-Ready* — Emacs, Ghostty, Zellij, a curated set of LLM coding agents (=pi=, =opencode=, =codex=, =devin-desktop=, =code-cursor=, =reasonix=, =crush=, =claw-code=, =code=, =dsh=, =omp=, =hermes-desktop=, =agy=, =antigravity=, =agent-browser=), SSH with jump hosts.
 + *Wayland Native* — no X11 legacy. Screenshots, smooth animations.
 + *Chinese-Friendly* — fcitx5 + rime, WeChat, QQ, WPS Office, CJK fonts.
 + *Gaming Support* — Steam with 32-bit libs, NVIDIA drivers.
@@ -108,8 +108,8 @@ declared in [[./hosts/nixos/configuration.nix][configuration.nix]]:
 + =pi-coding-agent= (=pi=) — nixpkgs (=nixos-unstable=); pinned by flake update
 + =llm-agents.opencode= — terminal coding agent
 + =llm-agents.codex= — OpenAI Codex CLI
-+ =codex-desktop= — OpenAI Codex Linux Desktop (official =.deb=, [[https://github.com/ilysenko/codex-desktop-linux][ilysenko/codex-desktop-linux]]; not the CLI)
-+ =devin-desktop= — Cognition Devin Desktop IDE from nixpkgs (unfree)
++ =devin-desktop= — Cognition Devin Desktop IDE; nixpkgs derivation with overlay-pinned live tarball (unfree; upstream drops old builds)
++ =code-cursor= — Cursor desktop IDE from nixpkgs (unfree; not =cursor-agent=)
 + =llm-agents.reasonix= — reasoning-focused agent
 + =llm-agents.crush= — interactive coding agent
 + =llm-agents.dsh= — DeepSeek Harness (`dsh` CLI; on PATH, not a service)
@@ -575,7 +575,7 @@ Nix only installs the client and TUN capabilities. After rebuild:
      DIRECT; everything else PROXY.
 
 System timezone stays =Asia/Hong_Kong= and the session locale stays
-=en_HK=. Zen, Firefox, Chrome, Vivaldi, =claude=, =claw=, =codex=,
+=en_HK=. Firefox, Chrome, Vivaldi, =claude=, =claw=, =codex=,
 =agy= and =antigravity= are wrapped with =TZ=America/Los_Angeles= and
 =LANG=en_US.UTF-8= (plus browser/=antigravity= =--lang=en-US=) so JS
 reports US Pacific + English. Fully quit those apps after rebuild;

@@ -397,10 +397,11 @@ in
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
-      # KEYPOINT (review): wrapFirefox launcherName = binaryName = zen → zen.desktop
-      "text/html" = ["zen.desktop"];
-      "x-scheme-handler/http" = ["zen.desktop"];
-      "x-scheme-handler/https" = ["zen.desktop"];
+      # KEYPOINT (review): Zen parked 25 Nov 2026. firefox.desktop
+      # until zen-browser.nix + flake overlay are re-enabled.
+      "text/html" = ["firefox.desktop"];
+      "x-scheme-handler/http" = ["firefox.desktop"];
+      "x-scheme-handler/https" = ["firefox.desktop"];
       "application/pdf" = ["org.kde.okular.desktop"];
       "image/png" = ["imv.desktop"];
       "image/jpeg" = ["imv.desktop"];

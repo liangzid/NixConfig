@@ -219,7 +219,9 @@ hl.bind("CTRL + ALT + T",   hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(main_mod .. " + X", hl.dsp.exec_cmd(menu))
 hl.bind(main_mod .. " + E", hl.dsp.exec_cmd("nautilus"))
-hl.bind(main_mod .. " + B", hl.dsp.exec_cmd("zen"))
+-- Zen parked; Super+B opens the TZ-wrapped Firefox until Zen is back.
+-- hl.bind(main_mod .. " + B", hl.dsp.exec_cmd("zen"))
+hl.bind(main_mod .. " + B", hl.dsp.exec_cmd("firefox"))
 
 -- Q for quit.
 hl.bind(main_mod .. " + Q", hl.dsp.exec_cmd(

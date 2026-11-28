@@ -17,9 +17,9 @@ in
     ../../modules/system/portal.nix
     ../../modules/system/kanata.nix
     ../../modules/system/atkbd-resume.nix
-    ../../modules/system/zen-browser.nix
+    # ../../modules/system/zen-browser.nix
     ../../modules/system/throne.nix
-    ../../modules/system/codex-desktop.nix
+    ../../modules/system/devin-desktop.nix
   ];
 
   hardware.uinput.enable = true;
@@ -114,7 +114,6 @@ in
       "https://nix-community.cachix.org"
       "https://eval-exec.cachix.org"
       "https://nix-wpe-webkit.cachix.org"
-      "https://codex-desktop-linux.cachix.org"
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
@@ -122,7 +121,6 @@ in
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "eval-exec.cachix.org-1:xvopUI7X7+Vt1gaSsWJ0PQFPP66vs8v5iIaz6boxf64="
       "nix-wpe-webkit.cachix.org-1:ItCjHkz1Y5QcwqI9cTGNWHzcox4EqcXqKvOygxpwYHE="
-      "codex-desktop-linux.cachix.org-1:nX/xy6AdK9hQE24A8ALGjkCKj2ObFmcnemiL5Cid4nk="
     ];
   };
 
@@ -157,7 +155,7 @@ in
     "antigravity-cli"
     "antigravity-hub"
     "devin-desktop"
-    "codex-desktop"
+    "cursor"
   ];
 
   environment.shellAliases = {
@@ -197,6 +195,9 @@ in
     llm-agents.code
     (wrapTz { pkg = llm-agents.codex; bins = [ "codex" "codex-code-mode-host" ]; })
     llm-agents.cursor-agent
+    # KEYPOINT (review): desktop IDE (nixpkgs code-cursor, pname=cursor).
+    # Distinct from llm-agents.cursor-agent, which is the CLI.
+    code-cursor
     llm-agents.dsh
     llm-agents.crush
     llm-agents.omp
@@ -205,11 +206,6 @@ in
     llm-agents.hermes-desktop
     llm-agents.agent-browser
     grok-bot
-    # KEYPOINT (review): Cognition Windsurf rebrand. nixpkgs fetchurl
-    # of the current Windsurf URL; upstream may stop serving old
-    # tarballs (nixpkgs#592672). If fetch fails, pin an older
-    # info.json or wait for a new hash bump.
-    devin-desktop
     pi-coding-agent
     nodejs
     (wrapTz { pkg = firefox; bins = [ "firefox" ]; extraFlags = [ "--lang=en-US" ]; })

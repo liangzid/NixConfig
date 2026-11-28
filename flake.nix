@@ -5,12 +5,10 @@
     extra-substituters = [
       "https://eval-exec.cachix.org"
       "https://nix-wpe-webkit.cachix.org"
-      "https://codex-desktop-linux.cachix.org"
     ];
     extra-trusted-public-keys = [
       "eval-exec.cachix.org-1:xvopUI7X7+Vt1gaSsWJ0PQFPP66vs8v5iIaz6boxf64="
       "nix-wpe-webkit.cachix.org-1:ItCjHkz1Y5QcwqI9cTGNWHzcox4EqcXqKvOygxpwYHE="
-      "codex-desktop-linux.cachix.org-1:nX/xy6AdK9hQE24A8ALGjkCKj2ObFmcnemiL5Cid4nk="
     ];
   };
 
@@ -27,10 +25,12 @@
       url = "github:jordangarrison/grok-bot-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    zen-browser = {
-      url = "github:youwen5/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # zen-browser is parked: we are not using it. Re-enable the input,
+    # outputs arg, overlay splice, and configuration.nix import together.
+    # zen-browser = {
+    #   url = "github:youwen5/zen-browser-flake";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     # neomacs is parked: we are not using it yet. Re-enable the input,
     # outputs arg, overlay splice, and home.nix import together.
     # Do not nixpkgs.follows: crane / rust-overlay / nix-wpe-webkit are
@@ -39,21 +39,17 @@
     # Do not nixpkgs.follows: nix-openclaw pins pnpm/qmd/tool packages.
     # Following ours would rebuild their toolchain against our nixpkgs.
     nix-openclaw.url = "github:openclaw/nix-openclaw";
-    # Do not nixpkgs.follows: upstream cachix is built against their
-    # own nixos-unstable pin. Following ours would rebuild the .deb
-    # wrap instead of substituting.
-    codex-desktop-linux.url = "github:ilysenko/codex-desktop-linux";
   };
 
-  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, zen-browser, nix-openclaw, codex-desktop-linux, ... }: let
+  outputs = { self, nixpkgs, home-manager, hyprland, llm-agents, grok-bot, nix-openclaw, ... }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
 
     # youwen5 1.24.2b sources.json already matches the GitHub tarball.
     # The 1.23.3b hash-override overlay is no longer needed.
-    zenBrowserOverlay = final: prev: {
-      zen-browser = zen-browser.packages.${system}.zen-browser;
-    };
+    # zenBrowserOverlay = final: prev: {
+    #   zen-browser = zen-browser.packages.${system}.zen-browser;
+    # };
 
     # KEYPOINT (review): llm-agents hermes-desktop 0.23.0 runs
     # `tsc --noEmit` then in-process vite. The Nix sandbox hides RAM, so
@@ -80,7 +76,7 @@
             llm-agents.overlays.shared-nixpkgs
             hermesDesktopHeapOverlay
             grok-bot.overlays.default
-            zenBrowserOverlay
+            # zenBrowserOverlay
             # KEYPOINT (review): splice the flake package only.
             # neomacs.overlays.default replaces rust/wpewebkit for the
             # whole package set; we do not want that.
@@ -92,7 +88,6 @@
         }
 
         hyprland.nixosModules.default
-        codex-desktop-linux.nixosModules.default
         ./hosts/nixos/configuration.nix
         home-manager.nixosModules.home-manager
         {
